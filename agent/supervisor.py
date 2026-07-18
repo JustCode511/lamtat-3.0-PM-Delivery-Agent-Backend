@@ -21,6 +21,8 @@ Intents:
 - track_milestones: user asks about milestones, deadlines, progress, or schedule
 - flag_risks: user asks about risks, blockers, issues, or project health
 - generate_status_report: user wants a status update, summary, or overview
+- send_slack_notification: user explicitly asks to send a Slack message, notify the team,
+  share an update on Slack, ping the channel, or alert stakeholders via Slack
 - default: greetings, small talk, out-of-scope questions, or unclear requests
 
 Rules for project key:
@@ -32,9 +34,11 @@ Rules for intent:
 - If the current message is a short follow-up answer (e.g. just a project name or key) to the
   agent's previous question, inherit the intent from the most recent user turn in history
 - If the user is explicitly changing topic, use the new intent
+- Prefer send_slack_notification when the user's primary goal is to notify/alert others on Slack,
+  even if a project is also mentioned
 
 Reply with JSON only — no other text:
-{"intent": "<one of the 5 intents>", "project_key": "<KEY or null>"}"""
+{"intent": "<one of the 6 intents>", "project_key": "<KEY or null>"}"""
 
 
 def make_supervisor_node(llm: LLMClient):

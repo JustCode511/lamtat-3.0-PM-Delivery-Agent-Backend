@@ -16,6 +16,7 @@ Intent = Literal[
     "track_milestones",
     "flag_risks",
     "generate_status_report",
+    "send_slack_notification",
     "default",
 ]
 

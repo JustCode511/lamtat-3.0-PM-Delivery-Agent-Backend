@@ -36,6 +36,17 @@ Given the project data below, write a concise status report covering:
 
 Keep it executive-friendly — no raw JSON, no internal keys."""
 
+SLACK_NOTIFICATION_COMPOSE_PROMPT = """You are a PM Delivery Agent composing a Slack notification for the team.
+
+Given the user's request and any available project context, write a clear, concise Slack message
+that communicates the key information. The message should be:
+- Professional but conversational (Slack tone, not email)
+- Concise — 3-6 lines maximum
+- Action-oriented when relevant (include next steps or a call to action)
+- Plain text only — no markdown headers, no raw JSON
+
+Return ONLY the message text that will be posted to Slack. Nothing else."""
+
 DEFAULT_NODE_PROMPT = """You are a PM Delivery Agent assistant.
 
 If the user is greeting you, greet them back warmly and briefly introduce yourself.
@@ -45,6 +56,7 @@ If the user is asking something outside your scope, politely explain what you ca
 - Tracking milestones and deadlines
 - Flagging risks and blockers
 - Generating project status reports
+- Sending Slack notifications to your team
 
 Keep your response concise and friendly."""
 
@@ -128,6 +140,41 @@ def make_nodes(llm: LLMClient, mcp: Any) -> dict[str, Any]:
         log.info("[NODE] generate_status_report complete")
         return {**state, "result": result}
 
+    async def send_slack_notification_node(state: AgentState) -> AgentState:
+        pk = state.get("project_key")
+        log.info("[NODE] send_slack_notification  project_key=%r", pk)
+
+        context = f"User request: {state['user_message']}"
+        if pk:
+            log.info("[TOOL] get_project_status(%r) for notification context", pk)
+            try:
+                status_data = await mcp.call_tool("get_project_status", {"project_key": pk})
+                context += f"\n\nProject context:\n{status_data}"
+            except Exception as exc:
+                log.warning("[NODE] could not fetch project context: %s", exc)
+
+        slack_message = await llm_generate(llm, SLACK_NOTIFICATION_COMPOSE_PROMPT, context)
+
+        log.info("[TOOL] send_slack_notification")
+        send_result = await mcp.call_tool(
+            "send_slack_notification",
+            {"message": slack_message, **({"project_key": pk} if pk else {})},
+        )
+
+        send_obj = json.loads(send_result) if isinstance(send_result, str) else send_result
+        if send_obj.get("sent"):
+            result = f"Notification sent to Slack successfully.\n\n**Message sent:**\n{slack_message}"
+        else:
+            note = send_obj.get("note", "")
+            preview = send_obj.get("preview", slack_message)
+            result = (
+                f"Slack is not configured yet — here is the message that would have been sent:\n\n"
+                f"{preview}\n\n_{note}_"
+            )
+
+        log.info("[NODE] send_slack_notification complete  sent=%r", send_obj.get("sent"))
+        return {**state, "result": result}
+
     async def default_node(state: AgentState) -> AgentState:
         log.info("[NODE] default  message=%r", state["user_message"])
         result = await llm_generate(llm, DEFAULT_NODE_PROMPT, state["user_message"])
@@ -139,5 +186,6 @@ def make_nodes(llm: LLMClient, mcp: Any) -> dict[str, Any]:
         "track_milestones": track_milestones_node,
         "flag_risks": flag_risks_node,
         "generate_status_report": generate_status_report_node,
+        "send_slack_notification": send_slack_notification_node,
         "default": default_node,
     }

@@ -68,6 +68,18 @@ class InlineMCPClient:
                 },
                 required=["project_key", "summary"],
             ),
+            ToolSpec(
+                name="send_slack_notification",
+                description=(
+                    "Send a general notification or update message to the Slack channel. "
+                    "Use when the user explicitly asks to notify the team or send a Slack update."
+                ),
+                parameters={
+                    "message": {"type": "string", "description": "The notification message to send"},
+                    "project_key": {"type": "string", "description": "Optional Jira project key for context"},
+                },
+                required=["message"],
+            ),
         ]
 
     async def call_tool(self, name: str, arguments: dict[str, Any]) -> str:
@@ -79,6 +91,8 @@ class InlineMCPClient:
             data = jira_client.get_risks(arguments["project_key"])
         elif name == "request_approval":
             data = slack_client.post_approval(arguments["project_key"], arguments["summary"])
+        elif name == "send_slack_notification":
+            data = slack_client.send_notification(arguments["message"], arguments.get("project_key"))
         else:
             data = {"error": f"Unknown tool: {name}"}
         return json.dumps(data)
