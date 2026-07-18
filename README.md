@@ -6,8 +6,6 @@ a one-line config switch.
 
 ## Architecture at a glance
 
-
-
 ```
 CLI / FastAPI  ->  Agent Core (the loop)  ->  LLM (Gemini local / Bedrock AWS)
                           |
