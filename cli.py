@@ -1,24 +1,28 @@
 """
 CLI — talk to the agent from your terminal. Fastest way to test locally.
 
-Run (Windows & Mac, from the project root, with venv active):
+Run (from the project root, with venv active):
     python cli.py
-
-Type messages; type 'exit' or 'quit' to stop.
 """
 from __future__ import annotations
 import asyncio
+import logging
 import uuid
 
 from agent.core import Agent
-from agent.mcp_client import MCPClient
-from shared.config import get_llm, get_session_store
+from shared.config import get_llm, get_mcp_client, get_session_store
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(name)s  %(message)s",
+    datefmt="%H:%M:%S",
+)
 
 
 async def main() -> None:
     llm = get_llm()
     store = get_session_store()
-    mcp = MCPClient()
+    mcp = get_mcp_client()
 
     print("Connecting to MCP server...")
     await mcp.connect()
@@ -35,16 +39,12 @@ async def main() -> None:
                 break
             if not user:
                 continue
-            answer = await agent_reply(llm, store, mcp, session_id, user)
+            agent = Agent(llm, store, mcp)
+            answer = await agent.chat(session_id, user)
             print(f"\nAgent: {answer}\n")
     finally:
         await mcp.close()
         print("Goodbye.")
-
-
-async def agent_reply(llm, store, mcp, session_id, user) -> str:
-    agent = Agent(llm, store, mcp)
-    return await agent.chat(session_id, user)
 
 
 if __name__ == "__main__":

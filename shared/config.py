@@ -22,7 +22,7 @@ from interfaces.storage import SessionStore
 load_dotenv()
 
 APP_ENV = os.getenv("APP_ENV", "local")
-LLM_PROVIDER = os.getenv("LLM_PROVIDER", "gemini")
+LLM_PROVIDER = os.getenv("LLM_PROVIDER", "openai")
 
 
 def get_llm() -> LLMClient:
@@ -33,7 +33,17 @@ def get_llm() -> LLMClient:
     if LLM_PROVIDER == "bedrock":
         from adapters.llm_bedrock import BedrockClient
         return BedrockClient()
+    if LLM_PROVIDER == "openai":
+        from adapters.llm_openai import OpenAIClient
+        return OpenAIClient(model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"))
     raise ValueError(f"Unknown LLM_PROVIDER: {LLM_PROVIDER}")
+
+
+def get_mcp_client():
+    """Return the MCP client. InlineMCPClient is used in all environments —
+    it calls Jira/Slack functions directly with no subprocess dependency."""
+    from adapters.mcp_inline import InlineMCPClient
+    return InlineMCPClient()
 
 
 def get_session_store() -> SessionStore:
