@@ -80,6 +80,41 @@ class InlineMCPClient:
                 },
                 required=["message"],
             ),
+            ToolSpec(
+                name="search_issues",
+                description=(
+                    "Search and filter Jira issues. Supports filtering by assignee name "
+                    "(partial display name match — no accountId needed), status, and project. "
+                    "Use for: 'tickets assigned to X', 'show all bugs', 'what is X working on', "
+                    "'list in-progress items', 'show all tickets in project Y'."
+                ),
+                parameters={
+                    "project_key": {"type": "string", "description": "Jira project key (optional — omit for all projects)"},
+                    "assignee": {"type": "string", "description": "Filter by assignee display name, e.g. 'Chaithanya' or 'Parth Kansara'"},
+                    "status": {"type": "string", "description": "Filter by status name, e.g. 'In Progress', 'To Do'"},
+                    "jql": {"type": "string", "description": "Raw JQL query string (overrides other filters when provided)"},
+                    "max_results": {"type": "integer", "description": "Maximum number of issues to return (default: 100)"},
+                },
+                required=[],
+            ),
+            ToolSpec(
+                name="create_issue",
+                description=(
+                    "Create a new Jira issue (task, bug, story, etc.) in a project. "
+                    "Use when the user asks to create a ticket, raise an issue, log a bug, "
+                    "or add a task to a project."
+                ),
+                parameters={
+                    "project_key": {"type": "string", "description": "The Jira project key, e.g. SCRUM"},
+                    "summary": {"type": "string", "description": "One-line title of the issue"},
+                    "description": {"type": "string", "description": "Optional detailed description"},
+                    "issue_type": {"type": "string", "description": "Task, Bug, Story, Epic (default: Task)"},
+                    "priority": {"type": "string", "description": "Highest, High, Medium, Low, Lowest (default: Medium)"},
+                    "assignee_name": {"type": "string", "description": "Optional display name of the assignee (e.g. 'Parth Kansara')"},
+                    "assignee_email": {"type": "string", "description": "Optional email to assign the issue to"},
+                },
+                required=["project_key", "summary"],
+            ),
         ]
 
     async def call_tool(self, name: str, arguments: dict[str, Any]) -> str:
@@ -93,6 +128,24 @@ class InlineMCPClient:
             data = slack_client.post_approval(arguments["project_key"], arguments["summary"])
         elif name == "send_slack_notification":
             data = slack_client.send_notification(arguments["message"], arguments.get("project_key"))
+        elif name == "search_issues":
+            data = jira_client.search_issues(
+                project_key=arguments.get("project_key", ""),
+                assignee=arguments.get("assignee", ""),
+                status=arguments.get("status", ""),
+                jql=arguments.get("jql", ""),
+                max_results=arguments.get("max_results", 100),
+            )
+        elif name == "create_issue":
+            data = jira_client.create_issue(
+                project_key=arguments["project_key"],
+                summary=arguments["summary"],
+                description=arguments.get("description", ""),
+                issue_type=arguments.get("issue_type", "Task"),
+                priority=arguments.get("priority", "Medium"),
+                assignee_email=arguments.get("assignee_email"),
+                assignee_name=arguments.get("assignee_name"),
+            )
         else:
             data = {"error": f"Unknown tool: {name}"}
         return json.dumps(data)

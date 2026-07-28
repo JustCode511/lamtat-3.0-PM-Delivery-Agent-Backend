@@ -26,8 +26,14 @@ Guidelines:
 Return only the final polished response. Nothing else."""
 
 
+_PASS_THROUGH = frozenset({"query", "out_of_scope", "clarify_project"})
+
+
 def make_aggregator_node(llm: LLMClient):
     async def aggregator_node(state: AgentState) -> AgentState:
+        if state["intent"] in _PASS_THROUGH:
+            log.info("[NODE] aggregator skipped for %r", state["intent"])
+            return state
         log.info("[NODE] aggregator  intent=%r  draft_len=%d", state["intent"], len(state["result"]))
         polished = await llm_generate(
             llm,

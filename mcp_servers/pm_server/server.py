@@ -110,6 +110,63 @@ async def list_tools() -> list[types.Tool]:
                 "required": ["message"],
             },
         ),
+        types.Tool(
+            name="search_issues",
+            description="Search and filter Jira issues. Supports assignee name (partial match), status, project key, or raw JQL.",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "project_key": {"type": "string", "description": "Jira project key (optional)"},
+                    "assignee": {"type": "string", "description": "Filter by assignee display name (partial match)"},
+                    "status": {"type": "string", "description": "Filter by status name, e.g. 'In Progress'"},
+                    "jql": {"type": "string", "description": "Raw JQL query (overrides other filters)"},
+                    "max_results": {"type": "integer", "description": "Max results (default 100)"},
+                },
+                "required": [],
+            },
+        ),
+        types.Tool(
+            name="create_issue",
+            description=(
+                "Create a new Jira issue (task, bug, story, etc.) in a project. "
+                "Use when the user asks to create a ticket, raise an issue, log a bug, "
+                "or add a task to a project."
+            ),
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "project_key": {
+                        "type": "string",
+                        "description": "The Jira project key, e.g. SCRUM",
+                    },
+                    "summary": {
+                        "type": "string",
+                        "description": "One-line title of the issue",
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Optional detailed description",
+                    },
+                    "issue_type": {
+                        "type": "string",
+                        "description": "Issue type: Task, Bug, Story, Epic (default: Task)",
+                    },
+                    "priority": {
+                        "type": "string",
+                        "description": "Priority: Highest, High, Medium, Low, Lowest (default: Medium)",
+                    },
+                    "assignee_name": {
+                        "type": "string",
+                        "description": "Optional display name of the assignee (e.g. 'Parth Kansara')",
+                    },
+                    "assignee_email": {
+                        "type": "string",
+                        "description": "Optional email of the person to assign the issue to",
+                    },
+                },
+                "required": ["project_key", "summary"],
+            },
+        ),
     ]
 
 
@@ -128,6 +185,24 @@ async def call_tool(name: str, arguments: dict) -> list[types.TextContent]:
     elif name == "send_slack_notification":
         data = slack_client.send_notification(
             arguments["message"], arguments.get("project_key")
+        )
+    elif name == "search_issues":
+        data = jira_client.search_issues(
+            project_key=arguments.get("project_key", ""),
+            assignee=arguments.get("assignee", ""),
+            status=arguments.get("status", ""),
+            jql=arguments.get("jql", ""),
+            max_results=arguments.get("max_results", 100),
+        )
+    elif name == "create_issue":
+        data = jira_client.create_issue(
+            project_key=arguments["project_key"],
+            summary=arguments["summary"],
+            description=arguments.get("description", ""),
+            issue_type=arguments.get("issue_type", "Task"),
+            priority=arguments.get("priority", "Medium"),
+            assignee_email=arguments.get("assignee_email"),
+            assignee_name=arguments.get("assignee_name"),
         )
     else:
         data = {"error": f"Unknown tool: {name}"}

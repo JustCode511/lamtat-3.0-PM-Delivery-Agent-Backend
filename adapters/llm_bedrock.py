@@ -98,3 +98,56 @@ class BedrockClient(LLMClient):
                 )
 
         return LLMResponse(text=text_out, tool_calls=tool_calls)
+
+    def run_conversation(
+        self,
+        system_prompt: str,
+        user_message: str,
+        history: list[dict[str, Any]],
+        tools: list[ToolSpec],
+        tool_executor,
+        max_rounds: int = 5,
+    ) -> str:
+        bedrock_tools = self._to_bedrock_tools(tools) if tools else []
+
+        # Build initial messages from history
+        messages: list[dict[str, Any]] = self._to_bedrock_messages(
+            [m for m in history if m["role"] in ("user", "assistant")]
+        )
+        # Add current user message
+        messages.append({"role": "user", "content": [{"text": user_message}]})
+
+        for _ in range(max_rounds):
+            kwargs: dict[str, Any] = {
+                "modelId": self.model_id,
+                "system": [{"text": system_prompt}],
+                "messages": messages,
+                "inferenceConfig": {"maxTokens": 2048, "temperature": 0.2},
+            }
+            if bedrock_tools:
+                kwargs["toolConfig"] = {"tools": bedrock_tools}
+
+            response = self.client.converse(**kwargs)
+            output_msg = response["output"]["message"]
+            messages.append(output_msg)
+
+            tool_use_blocks = [b for b in output_msg["content"] if "toolUse" in b]
+            text_blocks = [b.get("text", "") for b in output_msg["content"] if "text" in b]
+
+            if not tool_use_blocks:
+                return "".join(text_blocks) or "[No answer produced.]"
+
+            # Execute each tool call and collect results
+            tool_results = []
+            for block in tool_use_blocks:
+                tu = block["toolUse"]
+                result = tool_executor(tu["name"], tu["input"])
+                tool_results.append({
+                    "toolResult": {
+                        "toolUseId": tu["toolUseId"],
+                        "content": [{"text": str(result)}],
+                    }
+                })
+            messages.append({"role": "user", "content": tool_results})
+
+        return "[Max tool rounds reached without final answer.]"

@@ -1,64 +1,79 @@
 """
-Supervisor node — classifies user intent and extracts project key.
-Uses conversation history for context when the current message is ambiguous.
-Never calls tools; routing only.
+Supervisor node — scope guard + broad intent classifier.
+
+Only 5 real intents plus out_of_scope and default.
+The 'query' intent covers ALL PM read/analysis requests —
+the PM Query Agent handles the tool selection internally.
 """
 from __future__ import annotations
 import logging
-from typing import Any
-
+from datetime import date
 from agent.state import AgentState, extract_json, llm_generate
 from interfaces.llm import LLMClient
 
 log = logging.getLogger(__name__)
 
-SUPERVISOR_PROMPT = """You are a routing supervisor for a PM Delivery Agent.
-Classify the user's CURRENT message into one of these intents, using the conversation
-history for context when the current message alone is ambiguous.
+SUPERVISOR_PROMPT = """You are a scope guard and router for a PM Delivery Agent.
+Today: {today}
 
-Intents:
-- draft_deliverables: user wants to create, list, or draft project deliverables
-- track_milestones: user asks about milestones, deadlines, progress, or schedule
-- flag_risks: user asks about risks, blockers, issues, or project health
-- generate_status_report: user wants a status update, summary, or overview
-- send_slack_notification: user explicitly asks to send a Slack message, notify the team,
-  share an update on Slack, ping the channel, or alert stakeholders via Slack
-- default: greetings, small talk, out-of-scope questions, or unclear requests
+STEP 1 — SCOPE CHECK:
+This agent handles ONLY project management work: Jira projects, tickets, risks, milestones,
+team workload, deliverables, status reports, Slack notifications, and PowerPoint reports.
 
-Rules for project key:
-1. Check the current message first for a Jira project key (e.g. SCRUM, PROJ, AABG-HACKATHON-FY26)
-2. If not in current message, scan the conversation history for a previously mentioned key
-3. Project keys are often hyphenated strings or short uppercase words
+Use "out_of_scope" if the user asks for:
+- Writing or generating code, scripts, or programs
+- Translating text, writing essays, creative writing, or homework
+- News, weather, sports, personal questions, or anything unrelated to PM work
 
-Rules for intent:
-- If the current message is a short follow-up answer (e.g. just a project name or key) to the
-  agent's previous question, inherit the intent from the most recent user turn in history
-- If the user is explicitly changing topic, use the new intent
-- Prefer send_slack_notification when the user's primary goal is to notify/alert others on Slack,
-  even if a project is also mentioned
+STEP 2 — CLASSIFY intent (pick exactly one):
+- query      : ANY request to read, search, analyse, or report on PM/Jira data —
+                status, risks, milestones, team workload, ticket search, project comparison,
+                deliverables, "who is assigned to what", "show me tickets", "compare X vs Y",
+                "flag risks", "generate a summary", "what's at risk", "status report", etc.
+                NOTE: generating a report or summary for the user to READ is always "query" —
+                even if the user says "flag", "generate", "show me", "give me a report".
+- create_issue: user wants to CREATE a new Jira ticket, bug, story, task, or epic
+- send_slack_notification: user EXPLICITLY says "send to Slack", "post to Slack",
+                "notify the team on Slack", or "message the channel". Generating a report
+                for the user to read in chat is NOT this intent. The user must explicitly
+                request a Slack action.
+- generate_ppt: user explicitly wants a PowerPoint / PPT / slide deck file
+- out_of_scope: request is outside PM scope (see Step 1)
+- default    : greetings, "what can you do?", or genuinely unclear requests
+
+STEP 3 — EXTRACT project_key:
+- Return exactly ONE value: a single Jira key (e.g. AABGFY26), "__ALL__", or null
+- NEVER return comma-separated keys — if the user mentions multiple projects, return null
+- If user says "all projects", "all", "every project", "portfolio" → return "__ALL__"
+- If one specific project is clearly mentioned → return that key
+- Otherwise → null (the query agent resolves it using tools)
 
 Reply with JSON only — no other text:
-{"intent": "<one of the 6 intents>", "project_key": "<KEY or null>"}"""
+{{"intent": "<query|create_issue|send_slack_notification|generate_ppt|out_of_scope|default>", "project_key": "<KEY|__ALL__|null>"}}"""
 
 
 def make_supervisor_node(llm: LLMClient):
     async def supervisor_node(state: AgentState) -> AgentState:
-        log.info("[SUPERVISOR] Classifying message: %r", state["user_message"])
+        log.info("[SUPERVISOR] classifying: %r", state["user_message"][:100])
 
         history_block = ""
         if state["history"]:
-            recent = state["history"][-10:]  # last 5 turns (user + assistant pairs)
-            lines = "\n".join(f'{m["role"].upper()}: {m["content"]}' for m in recent)
-            history_block = f"\n\nConversation so far:\n{lines}"
+            recent = state["history"][-10:]
+            lines = "\n".join(f'{m["role"].upper()}: {m["content"][:200]}' for m in recent)
+            history_block = f"\n\nRecent conversation:\n{lines}"
 
+        today = date.today().isoformat()
         raw = await llm_generate(
             llm,
-            SUPERVISOR_PROMPT,
+            SUPERVISOR_PROMPT.format(today=today),
             f"Current message: {state['user_message']}{history_block}",
         )
         parsed = extract_json(raw)
         intent = parsed.get("intent", "default")
-        project_key = parsed.get("project_key") or state.get("project_key")
+        project_key = parsed.get("project_key") or None
+        # Normalise: null strings → None
+        if project_key in ("null", "none", ""):
+            project_key = None
         log.info("[SUPERVISOR] → intent=%r  project_key=%r", intent, project_key)
         return {**state, "intent": intent, "project_key": project_key}
 
