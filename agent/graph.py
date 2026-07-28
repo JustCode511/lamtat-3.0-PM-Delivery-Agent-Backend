@@ -1,15 +1,14 @@
 """
-Graph wiring — assembles the LangGraph supervisor graph from individual modules.
+Graph wiring — assembles the LangGraph supervisor graph.
 
-Flow:
-    START → supervisor → [specialized node] → aggregator → END
+Flow: START → supervisor → specialized node → aggregator → END
 
-Each component lives in its own module:
-    agent/supervisor.py  — intent classification
-    agent/nodes.py       — draft_deliverables, track_milestones, flag_risks,
-                           generate_status_report, default
-    agent/aggregator.py  — final formatting pass
-    agent/state.py       — AgentState, shared helpers
+Nodes:
+  query      — PM Query Agent (tool-calling, handles all read/analysis)
+  create_issue, generate_ppt, send_slack_notification — action nodes
+  out_of_scope — polite rejection (no LLM)
+  clarify_project — asks which project (used only when PPT needs one)
+  default — greetings / help
 """
 from __future__ import annotations
 import logging
@@ -26,13 +25,17 @@ from interfaces.llm import LLMClient
 log = logging.getLogger(__name__)
 
 SPECIALIZED_NODES = (
-    "draft_deliverables",
-    "track_milestones",
-    "flag_risks",
-    "generate_status_report",
+    "query",
+    "create_issue",
+    "generate_ppt",
     "send_slack_notification",
+    "out_of_scope",
+    "clarify_project",
     "default",
 )
+
+# Only PPT strictly requires a project key upfront
+_NEEDS_PROJECT = frozenset({"generate_ppt"})
 
 
 def build_graph(llm: LLMClient, mcp: Any) -> Any:
@@ -40,24 +43,23 @@ def build_graph(llm: LLMClient, mcp: Any) -> Any:
     aggregator_node = make_aggregator_node(llm)
     nodes = make_nodes(llm, mcp)
 
-    def route_from_supervisor(state: AgentState) -> str:
+    def route(state: AgentState) -> str:
         intent = state["intent"]
-        log.info("[ROUTER] dispatching to → %r", intent)
+        pk = state.get("project_key")
+        if intent in _NEEDS_PROJECT and not pk:
+            log.info("[ROUTER] no project key for %r → clarify_project", intent)
+            return "clarify_project"
+        log.info("[ROUTER] → %r  project_key=%r", intent, pk)
         return intent
 
     g: StateGraph = StateGraph(AgentState)
-
     g.add_node("supervisor", supervisor_node)
     for name, fn in nodes.items():
         g.add_node(name, fn)
     g.add_node("aggregator", aggregator_node)
 
     g.add_edge(START, "supervisor")
-    g.add_conditional_edges(
-        "supervisor",
-        route_from_supervisor,
-        {name: name for name in SPECIALIZED_NODES},
-    )
+    g.add_conditional_edges("supervisor", route, {n: n for n in SPECIALIZED_NODES})
     for name in SPECIALIZED_NODES:
         g.add_edge(name, "aggregator")
     g.add_edge("aggregator", END)

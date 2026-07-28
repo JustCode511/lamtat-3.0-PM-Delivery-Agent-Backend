@@ -6,6 +6,9 @@ fastapi==0.115.0              # local API entry point
 uvicorn==0.30.6              # runs FastAPI locally
 httpx==0.27.2                # HTTP client for Jira/Slack (cross-platform, async-capable)
 
+# --- Exports ---
+python-pptx>=1.0.0            # PowerPoint report generation (no Office required)
+
 # --- LLM (local dev) ---
 google-generativeai==0.8.3   # Gemini API client
 openai>=1.30.0               # OpenAI ChatGPT adapter (set LLM_PROVIDER=openai)

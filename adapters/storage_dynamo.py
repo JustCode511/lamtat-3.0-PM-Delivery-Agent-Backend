@@ -25,6 +25,9 @@ class DynamoSessionStore(SessionStore):
         return json.loads(item.get("history", "[]"))
 
     def save_history(self, session_id: str, messages: list[dict[str, Any]]) -> None:
+        import time
+        # TTL: sessions expire after 7 days (DynamoDB TTL attribute must be enabled on the table)
+        ttl = int(time.time()) + 7 * 24 * 60 * 60
         self.table.put_item(
-            Item={"session_id": session_id, "history": json.dumps(messages)}
+            Item={"session_id": session_id, "history": json.dumps(messages), "ttl": ttl}
         )
