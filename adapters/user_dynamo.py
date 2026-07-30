@@ -19,7 +19,8 @@ from interfaces.user_store import UserStore
 
 
 class DynamoUserStore(UserStore):
-    def __init__(self, table_name: str = "pm_users", region: str = "us-east-1") -> None:
+    def __init__(self, table_name: str = "pm_users", region: str | None = None) -> None:
+        # region=None -> boto3 uses AWS_REGION (set automatically on Lambda).
         self.table = boto3.resource("dynamodb", region_name=region).Table(table_name)
 
     def get_user(self, username: str) -> dict[str, Any] | None:

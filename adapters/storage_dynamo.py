@@ -14,7 +14,9 @@ from interfaces.storage import SessionStore
 
 
 class DynamoSessionStore(SessionStore):
-    def __init__(self, table_name: str = "pm_sessions", region: str = "us-east-1") -> None:
+    def __init__(self, table_name: str = "pm_sessions", region: str | None = None) -> None:
+        # region=None -> boto3 uses AWS_REGION (set automatically on Lambda),
+        # so the table region follows wherever the function is deployed.
         self.table = boto3.resource("dynamodb", region_name=region).Table(table_name)
 
     def get_history(self, session_id: str) -> list[dict[str, Any]]:
