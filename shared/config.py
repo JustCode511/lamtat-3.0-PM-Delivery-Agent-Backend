@@ -15,8 +15,11 @@ import os
 
 from dotenv import load_dotenv
 
+from interfaces.conversation_store import ConversationStore
 from interfaces.llm import LLMClient
 from interfaces.storage import SessionStore
+from interfaces.token_denylist import TokenDenylist
+from interfaces.user_store import UserStore
 
 # Load .env into environment (no-op on AWS where vars come from Lambda config)
 load_dotenv()
@@ -54,4 +57,37 @@ def get_session_store() -> SessionStore:
     if APP_ENV == "aws":
         from adapters.storage_dynamo import DynamoSessionStore
         return DynamoSessionStore()
+    raise ValueError(f"Unknown APP_ENV: {APP_ENV}")
+
+
+def get_user_store() -> UserStore:
+    """Return the active user (credentials) store based on APP_ENV."""
+    if APP_ENV == "local":
+        from adapters.user_json import JsonUserStore
+        return JsonUserStore()
+    if APP_ENV == "aws":
+        from adapters.user_dynamo import DynamoUserStore
+        return DynamoUserStore()
+    raise ValueError(f"Unknown APP_ENV: {APP_ENV}")
+
+
+def get_token_denylist() -> TokenDenylist:
+    """Return the active token denylist (for sign-out revocation) based on APP_ENV."""
+    if APP_ENV == "local":
+        from adapters.denylist_json import JsonTokenDenylist
+        return JsonTokenDenylist()
+    if APP_ENV == "aws":
+        from adapters.denylist_dynamo import DynamoTokenDenylist
+        return DynamoTokenDenylist()
+    raise ValueError(f"Unknown APP_ENV: {APP_ENV}")
+
+
+def get_conversation_store() -> ConversationStore:
+    """Return the active conversation archive (for the history sidebar) based on APP_ENV."""
+    if APP_ENV == "local":
+        from adapters.conversation_json import JsonConversationStore
+        return JsonConversationStore()
+    if APP_ENV == "aws":
+        from adapters.conversation_dynamo import DynamoConversationStore
+        return DynamoConversationStore()
     raise ValueError(f"Unknown APP_ENV: {APP_ENV}")

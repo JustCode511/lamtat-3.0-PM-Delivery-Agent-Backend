@@ -16,5 +16,10 @@ openai>=1.30.0               # OpenAI ChatGPT adapter (set LLM_PROVIDER=openai)
 # --- MCP ---
 mcp==1.1.2                    # official Model Context Protocol SDK
 
+# --- Auth ---
+# PBKDF2 password hashing is stdlib (hashlib) — no dep needed and no compiled
+# wheel to break in the Lambda zip. Only JWT needs a library:
+pyjwt>=2.9.0                  # signs/verifies JWTs (pure Python, Lambda-safe)
+
 # --- AWS (used only when APP_ENV=aws; safe to install now) ---
 boto3==1.35.24               # DynamoDB, Bedrock, SSM
