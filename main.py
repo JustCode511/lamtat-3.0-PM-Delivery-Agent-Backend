@@ -31,12 +31,17 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import date
 
+from dotenv import load_dotenv
+load_dotenv()
+
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from agent.core import Agent
+from talent.agent import TalentAgent
+from talent.routes import router as talent_router
 from shared.auth import create_jwt, decode_jwt, hash_password, verify_password
 from shared.config import (
     get_conversation_store,
@@ -56,15 +61,17 @@ _users = get_user_store()
 _denylist = get_token_denylist()
 _conversations = get_conversation_store()
 
-# Singleton Agent — graph is built once and reused across all requests
+# Singleton agents — built once and reused across all requests
 _agent = None
+_talent_agent: TalentAgent | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _agent
+    global _agent, _talent_agent
     await _mcp.connect()
     _agent = Agent(_llm, _store, _mcp)
+    _talent_agent = TalentAgent(_llm, _store)
     yield
     await _mcp.close()
 
@@ -76,19 +83,22 @@ def _is_reportable(user_message: str) -> bool:
     return "report" in msg and "send" in msg
 
 
-app = FastAPI(title="PM Delivery Agent", lifespan=lifespan)
+app = FastAPI(title="AI Delivery Intelligence", lifespan=lifespan)
 
 # ---------------------------------------------------------------------------
 # CORS — only the known frontends, only the methods we actually use
 # ---------------------------------------------------------------------------
-_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",") if o.strip()]
+_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:3000").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_ALLOWED_ORIGINS,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type", "X-API-Key", "Authorization"],
 )
+
+# Include talent router (all /talent/* endpoints)
+app.include_router(talent_router)
 
 # ---------------------------------------------------------------------------
 # JWT authentication — every protected endpoint depends on get_current_user,
@@ -606,6 +616,42 @@ async def pm_chat_stream(req: ChatRequest, user: str = Depends(get_current_user)
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
         },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Talent Management chat endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/talent/chat", response_model=ChatResponse)
+async def talent_chat(req: ChatRequest, user: str = Depends(get_current_user)) -> ChatResponse:
+    reply, intent = await _talent_agent.chat(req.session_id, req.message)
+    await _log_turn(user, req.session_id, req.message, reply, intent)
+    return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=False)
+
+
+@app.post("/talent/chat/stream")
+async def talent_chat_stream(req: ChatRequest, user: str = Depends(get_current_user)) -> StreamingResponse:
+    """Stream talent agent reply as SSE."""
+
+    async def generate():
+        try:
+            reply, intent = await _talent_agent.chat(req.session_id, req.message)
+        except Exception as exc:
+            reply, intent = f"Talent Agent error: {exc}", "talent"
+
+        await _log_turn(user, req.session_id, req.message, reply, intent)
+
+        yield f"data: {json.dumps({'type': 'start', 'intent': intent})}\n\n"
+        chunk = 6
+        for i in range(0, len(reply), chunk):
+            yield f"data: {json.dumps({'type': 'delta', 'delta': reply[i : i + chunk]})}\n\n"
+        yield f"data: {json.dumps({'type': 'done', 'intent': intent, 'full': reply, 'reportable': False})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
     )
 
 
