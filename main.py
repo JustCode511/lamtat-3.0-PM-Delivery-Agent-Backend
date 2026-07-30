@@ -16,13 +16,16 @@ Endpoints:
   GET  /export/ppt              → .pptx binary
 
 Security:
-  - API key auth via X-API-Key header (set API_KEY env var to enable)
+  - JWT auth: /auth/register + /auth/login issue signed tokens; every other
+    endpoint requires Authorization: Bearer <jwt>. Passwords are stored hashed
+    (PBKDF2) in the UserStore, never in plaintext.
   - Message length capped at 2000 characters
   - CORS locked to known origins and methods only
 """
 from __future__ import annotations
 import asyncio
 import json
+import logging
 import os
 import uuid
 from contextlib import asynccontextmanager
@@ -31,15 +34,27 @@ from datetime import date
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response, StreamingResponse
-from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
 
 from agent.core import Agent
-from shared.config import get_llm, get_mcp_client, get_session_store
+from shared.auth import create_jwt, decode_jwt, hash_password, verify_password
+from shared.config import (
+    get_conversation_store,
+    get_llm,
+    get_mcp_client,
+    get_session_store,
+    get_token_denylist,
+    get_user_store,
+)
+
+log = logging.getLogger(__name__)
 
 _llm = get_llm()
 _store = get_session_store()
 _mcp = get_mcp_client()
+_users = get_user_store()
+_denylist = get_token_denylist()
+_conversations = get_conversation_store()
 
 # Singleton Agent — graph is built once and reused across all requests
 _agent = None
@@ -76,26 +91,55 @@ app.add_middleware(
 )
 
 # ---------------------------------------------------------------------------
-# API key authentication (optional — skipped when API_KEY env var is not set)
+# JWT authentication — every protected endpoint depends on get_current_user,
+# which verifies the `Authorization: Bearer <jwt>` header and returns the
+# authenticated username. Identity always comes from the signed token, never
+# from a client-supplied field.
 # ---------------------------------------------------------------------------
-_API_KEY = os.getenv("API_KEY", "")
-_api_key_header = APIKeyHeader(name="X-API-Key", auto_error=False)
 
-
-async def verify_api_key(
-    api_key: str | None = Depends(_api_key_header),
-    authorization: str | None = Header(default=None),
-) -> None:
-    if not _API_KEY:
-        return  # auth disabled in local dev when API_KEY is not configured
-    bearer = None
-    if authorization and authorization.startswith("Bearer "):
-        bearer = authorization.removeprefix("Bearer ")
-    if api_key != _API_KEY and bearer != _API_KEY:
+async def get_token_claims(authorization: str | None = Header(default=None)) -> dict:
+    """Verify the bearer JWT — signature, expiry, and that it hasn't been
+    revoked via sign-out — and return its claims."""
+    if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing API key. Pass it as the X-API-Key header.",
+            detail="Missing bearer token. Send Authorization: Bearer <token>.",
         )
+    token = authorization.removeprefix("Bearer ").strip()
+    try:
+        payload = decode_jwt(token)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token.",
+        )
+    if not payload.get("sub"):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Malformed token payload.",
+        )
+    jti = payload.get("jti")
+    if jti and await asyncio.to_thread(_denylist.is_revoked, jti):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Session has been signed out. Please log in again.",
+        )
+    return payload
+
+
+async def get_current_user(claims: dict = Depends(get_token_claims)) -> str:
+    """Return the authenticated username from the verified token."""
+    return claims["sub"]
+
+
+async def _log_turn(user: str, session_id: str, user_message: str, reply: str, intent: str) -> None:
+    """Archive one chat turn (user + assistant) for the history sidebar.
+    Best-effort — a logging failure must never break the chat response."""
+    try:
+        await asyncio.to_thread(_conversations.append, user, session_id, "user", user_message)
+        await asyncio.to_thread(_conversations.append, user, session_id, "assistant", reply, intent)
+    except Exception as exc:  # noqa: BLE001
+        log.warning("conversation archive failed for session=%s: %s", session_id, exc)
 
 
 # ---------------------------------------------------------------------------
@@ -117,13 +161,45 @@ class ChatResponse(BaseModel):
 
 
 class AuthRequest(BaseModel):
-    username: str
-    password: str
+    # Registration enforces the credential policy (3+/6+).
+    username: str = Field(..., min_length=3, max_length=50)
+    password: str = Field(..., min_length=6, max_length=128)
+
+
+class LoginRequest(BaseModel):
+    # Login only checks whether the credentials match — it does NOT enforce the
+    # length policy, so a wrong/short password returns 401 "invalid credentials"
+    # rather than a validation error meant for the registration form.
+    username: str = Field(..., min_length=1, max_length=50)
+    password: str = Field(..., min_length=1, max_length=128)
 
 
 class AuthResponse(BaseModel):
     token: str
     username: str
+
+
+class ConversationSummary(BaseModel):
+    session_id: str
+    title: str
+    updated_at: str | None = None
+    message_count: int = 0
+
+
+class ConversationListResponse(BaseModel):
+    conversations: list[ConversationSummary]
+
+
+class ConversationMessage(BaseModel):
+    role: str
+    content: str
+    ui_hint: str | None = None
+    created_at: str | None = None
+
+
+class ConversationDetailResponse(BaseModel):
+    session_id: str
+    messages: list[ConversationMessage]
 
 
 class ProjectSummary(BaseModel):
@@ -243,9 +319,10 @@ async def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
-@app.post("/chat", response_model=ChatResponse, dependencies=[Depends(verify_api_key)])
-async def chat(req: ChatRequest) -> ChatResponse:
+@app.post("/chat", response_model=ChatResponse)
+async def chat(req: ChatRequest, user: str = Depends(get_current_user)) -> ChatResponse:
     reply, intent = await _agent.chat(req.session_id, req.message)
+    await _log_turn(user, req.session_id, req.message, reply, intent)
     return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=_is_reportable(req.message))
 
 
@@ -253,7 +330,7 @@ async def chat(req: ChatRequest) -> ChatResponse:
 # PPT export — GET /export/ppt?project_key=SCRUM  (omit for all projects)
 # ---------------------------------------------------------------------------
 
-@app.get("/export/ppt", dependencies=[Depends(verify_api_key)])
+@app.get("/export/ppt", dependencies=[Depends(get_current_user)])
 async def export_ppt(
     project_key: str | None = Query(default=None, description="Jira project key; omit for all projects"),
 ) -> Response:
@@ -290,28 +367,45 @@ async def export_ppt(
 
 
 # ---------------------------------------------------------------------------
-# Auth endpoints — no real user store; the API key IS the token.
-# In local dev (API_KEY unset) a placeholder token is returned so the
-# frontend login flow still works without configuration.
+# Auth endpoints — real credentials stored (hashed) in the UserStore.
+# Register hashes the password with PBKDF2 and rejects duplicate usernames;
+# login verifies the hash and issues a signed JWT. The password is never
+# stored or returned in plaintext.
 # ---------------------------------------------------------------------------
-
-@app.post("/auth/login", response_model=AuthResponse)
-async def auth_login(req: AuthRequest) -> AuthResponse:
-    token = _API_KEY if _API_KEY else "dev-token"
-    return AuthResponse(token=token, username=req.username)
-
 
 @app.post("/auth/register", response_model=AuthResponse)
 async def auth_register(req: AuthRequest) -> AuthResponse:
-    token = _API_KEY if _API_KEY else "dev-token"
-    return AuthResponse(token=token, username=req.username)
+    pw_hash, salt = hash_password(req.password)
+    created = await asyncio.to_thread(_users.create_user, req.username, pw_hash, salt)
+    if not created:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Username already exists.")
+    return AuthResponse(token=create_jwt(req.username), username=req.username)
+
+
+@app.post("/auth/login", response_model=AuthResponse)
+async def auth_login(req: LoginRequest) -> AuthResponse:
+    user = await asyncio.to_thread(_users.get_user, req.username)
+    if not user or not verify_password(req.password, user["password_hash"], user["salt"]):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid username or password.")
+    return AuthResponse(token=create_jwt(req.username), username=req.username)
+
+
+@app.post("/auth/logout")
+async def auth_logout(claims: dict = Depends(get_token_claims)) -> dict:
+    """Voluntary sign-out — revoke the current token so it cannot be reused,
+    even though it hasn't expired yet."""
+    jti = claims.get("jti")
+    exp = claims.get("exp")
+    if jti:
+        await asyncio.to_thread(_denylist.revoke, jti, int(exp) if exp else None)
+    return {"ok": True}
 
 
 # ---------------------------------------------------------------------------
 # PM REST endpoints — thin wrappers over the Jira client
 # ---------------------------------------------------------------------------
 
-@app.get("/pm/projects", response_model=ProjectsResponse, dependencies=[Depends(verify_api_key)])
+@app.get("/pm/projects", response_model=ProjectsResponse, dependencies=[Depends(get_current_user)])
 async def pm_projects() -> ProjectsResponse:
     from mcp_servers.pm_server import jira_client
 
@@ -343,7 +437,7 @@ async def pm_projects() -> ProjectsResponse:
     return ProjectsResponse(projects=projects)
 
 
-@app.get("/pm/dashboard/{project_key}", response_model=DashboardResponse, dependencies=[Depends(verify_api_key)])
+@app.get("/pm/dashboard/{project_key}", response_model=DashboardResponse, dependencies=[Depends(get_current_user)])
 async def pm_dashboard(project_key: str) -> DashboardResponse:
     from mcp_servers.pm_server import jira_client
 
@@ -447,10 +541,33 @@ async def pm_dashboard(project_key: str) -> DashboardResponse:
 # PM module chat — delegates to the same agent as /chat
 # ---------------------------------------------------------------------------
 
-@app.post("/pm/chat", response_model=ChatResponse, dependencies=[Depends(verify_api_key)])
-async def pm_chat(req: ChatRequest) -> ChatResponse:
+@app.post("/pm/chat", response_model=ChatResponse)
+async def pm_chat(req: ChatRequest, user: str = Depends(get_current_user)) -> ChatResponse:
     reply, intent = await _agent.chat(req.session_id, req.message)
+    await _log_turn(user, req.session_id, req.message, reply, intent)
     return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=_is_reportable(req.message))
+
+
+# ---------------------------------------------------------------------------
+# Conversation history — powers the Claude-style sidebar. Scoped to the
+# authenticated user; you can only list and replay your own conversations.
+# ---------------------------------------------------------------------------
+
+@app.get("/pm/conversations", response_model=ConversationListResponse)
+async def list_conversations(user: str = Depends(get_current_user)) -> ConversationListResponse:
+    items = await asyncio.to_thread(_conversations.list_conversations, user)
+    return ConversationListResponse(conversations=[ConversationSummary(**it) for it in items])
+
+
+@app.get("/pm/conversations/{session_id}", response_model=ConversationDetailResponse)
+async def get_conversation(session_id: str, user: str = Depends(get_current_user)) -> ConversationDetailResponse:
+    msgs = await asyncio.to_thread(_conversations.get_messages, user, session_id)
+    if msgs is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found.")
+    return ConversationDetailResponse(
+        session_id=session_id,
+        messages=[ConversationMessage(**m) for m in msgs],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -458,8 +575,8 @@ async def pm_chat(req: ChatRequest) -> ChatResponse:
 # a live-typing effect while we wait for the agent (which runs to completion).
 # ---------------------------------------------------------------------------
 
-@app.post("/pm/chat/stream", dependencies=[Depends(verify_api_key)])
-async def pm_chat_stream(req: ChatRequest) -> StreamingResponse:
+@app.post("/pm/chat/stream")
+async def pm_chat_stream(req: ChatRequest, user: str = Depends(get_current_user)) -> StreamingResponse:
     """Stream the agent reply as SSE so the UI can render text as it arrives."""
 
     async def generate():
@@ -467,6 +584,9 @@ async def pm_chat_stream(req: ChatRequest) -> StreamingResponse:
             reply, intent = await _agent.chat(req.session_id, req.message)
         except Exception as exc:
             reply, intent = f"Agent error: {exc}", "default"
+
+        # Archive the turn for the history sidebar before streaming it out.
+        await _log_turn(user, req.session_id, req.message, reply, intent)
 
         # Tell the client the intent first so it can prepare the right renderer
         yield f"data: {json.dumps({'type': 'start', 'intent': intent})}\n\n"
@@ -559,7 +679,7 @@ class LeadershipRequest(BaseModel):
     report_text: str = Field(..., min_length=1)
 
 
-@app.get("/pm/activity", dependencies=[Depends(verify_api_key)])
+@app.get("/pm/activity", dependencies=[Depends(get_current_user)])
 async def pm_activity(limit: int = Query(default=25, ge=1, le=50)) -> dict:
     """Recent Jira activity events (creates, status/assignee/priority changes)."""
     from mcp_servers.pm_server import jira_client
@@ -569,7 +689,7 @@ async def pm_activity(limit: int = Query(default=25, ge=1, le=50)) -> dict:
     return {"events": events, "count": len(events)}
 
 
-@app.post("/pm/send-to-leadership", dependencies=[Depends(verify_api_key)])
+@app.post("/pm/send-to-leadership", dependencies=[Depends(get_current_user)])
 async def send_to_leadership(req: LeadershipRequest) -> dict:
     """PM clicked 'Send to Leadership' — post the report directly to Slack channel."""
     from mcp_servers.pm_server.slack_client import post_to_channel
