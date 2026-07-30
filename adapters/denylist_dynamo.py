@@ -17,7 +17,8 @@ from interfaces.token_denylist import TokenDenylist
 
 
 class DynamoTokenDenylist(TokenDenylist):
-    def __init__(self, table_name: str = "pm_revoked_tokens", region: str = "us-east-1") -> None:
+    def __init__(self, table_name: str = "pm_revoked_tokens", region: str | None = None) -> None:
+        # region=None -> boto3 uses AWS_REGION (set automatically on Lambda).
         self.table = boto3.resource("dynamodb", region_name=region).Table(table_name)
 
     def revoke(self, jti: str, expires_at: int | None = None) -> None:

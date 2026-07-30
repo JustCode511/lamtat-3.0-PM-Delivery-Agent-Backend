@@ -7,6 +7,7 @@ On Lambda, credentials come from the IAM role automatically (no key needed).
 """
 from __future__ import annotations
 import json
+import os
 from typing import Any
 
 import boto3
@@ -17,10 +18,15 @@ from interfaces.llm import LLMClient, LLMResponse, ToolCall, ToolSpec
 class BedrockClient(LLMClient):
     def __init__(
         self,
-        model_id: str = "anthropic.claude-3-5-haiku-20241022-v1:0",
-        region: str = "us-east-1",
+        model_id: str | None = None,
+        region: str | None = None,
     ) -> None:
-        self.model_id = model_id
+        # Deployment controls both via env:
+        #   BEDROCK_MODEL_ID -> e.g. an APAC inference profile "apac.anthropic.claude-sonnet-..."
+        #   region=None      -> boto3 uses AWS_REGION (set automatically on Lambda)
+        self.model_id = model_id or os.getenv(
+            "BEDROCK_MODEL_ID", "anthropic.claude-3-5-haiku-20241022-v1:0"
+        )
         self.client = boto3.client("bedrock-runtime", region_name=region)
 
     def _to_bedrock_tools(self, tools: list[ToolSpec]) -> list[dict[str, Any]]:

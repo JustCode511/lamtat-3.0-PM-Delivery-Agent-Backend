@@ -28,7 +28,8 @@ _TITLE_MAX = 60
 
 
 class DynamoConversationStore(ConversationStore):
-    def __init__(self, table_name: str = "pm_conversations", region: str = "us-east-1") -> None:
+    def __init__(self, table_name: str = "pm_conversations", region: str | None = None) -> None:
+        # region=None -> boto3 uses AWS_REGION (set automatically on Lambda).
         self.table = boto3.resource("dynamodb", region_name=region).Table(table_name)
 
     def append(self, user_id, session_id, role, content, ui_hint=None) -> None:
