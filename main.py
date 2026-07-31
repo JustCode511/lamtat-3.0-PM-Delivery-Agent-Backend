@@ -27,9 +27,13 @@ import asyncio
 import json
 import logging
 import os
+import time
 import uuid
 from contextlib import asynccontextmanager
 from datetime import date
+
+from dotenv import load_dotenv
+load_dotenv()
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -37,8 +41,12 @@ from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 
 from agent.core import Agent
+from talent.agent import TalentAgent
+from talent.routes import router as talent_router
 from shared.auth import create_jwt, decode_jwt, hash_password, verify_password
 from shared.aws_secrets import load_secrets_from_ssm
+from shared.long_term_memory import LongTermMemory
+from shared.observability import log_chat_event, log_request
 from shared.config import (
     get_conversation_store,
     get_llm,
@@ -61,15 +69,19 @@ _users = get_user_store()
 _denylist = get_token_denylist()
 _conversations = get_conversation_store()
 
-# Singleton Agent — graph is built once and reused across all requests
+# Singleton agents — built once and reused across all requests
 _agent = None
+_talent_agent: TalentAgent | None = None
+_memory: LongTermMemory | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _agent
+    global _agent, _talent_agent, _memory
     await _mcp.connect()
-    _agent = Agent(_llm, _store, _mcp)
+    _memory = LongTermMemory(_llm)
+    _agent = Agent(_llm, _store, _mcp, memory=_memory)
+    _talent_agent = TalentAgent(_llm, _store, memory=_memory)
     yield
     await _mcp.close()
 
@@ -81,19 +93,41 @@ def _is_reportable(user_message: str) -> bool:
     return "report" in msg and "send" in msg
 
 
-app = FastAPI(title="PM Delivery Agent", lifespan=lifespan)
+app = FastAPI(title="AI Delivery Intelligence", lifespan=lifespan)
 
 # ---------------------------------------------------------------------------
 # CORS — only the known frontends, only the methods we actually use
 # ---------------------------------------------------------------------------
-_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:3000").split(",") if o.strip()]
+_ALLOWED_ORIGINS = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173,http://localhost:5174,http://localhost:3000").split(",") if o.strip()]
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_ALLOWED_ORIGINS,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Content-Type", "X-API-Key", "Authorization"],
 )
+
+# ---------------------------------------------------------------------------
+# Observability middleware — records latency + status for every request
+# ---------------------------------------------------------------------------
+
+@app.middleware("http")
+async def _observability_middleware(request: Request, call_next):
+    t0 = time.monotonic()
+    response = await call_next(request)
+    latency_ms = (time.monotonic() - t0) * 1000
+    await asyncio.to_thread(
+        log_request,
+        path=request.url.path,
+        method=request.method,
+        status_code=response.status_code,
+        latency_ms=latency_ms,
+    )
+    return response
+
+
+# Include talent router (all /talent/* endpoints)
+app.include_router(talent_router)
 
 # ---------------------------------------------------------------------------
 # JWT authentication — every protected endpoint depends on get_current_user,
@@ -326,9 +360,17 @@ async def health() -> dict[str, str]:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest, user: str = Depends(get_current_user)) -> ChatResponse:
-    reply, intent = await _agent.chat(req.session_id, req.message)
-    await _log_turn(user, req.session_id, req.message, reply, intent)
-    return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=_is_reportable(req.message))
+    t0 = time.monotonic()
+    try:
+        reply, intent = await _agent.chat(req.session_id, req.message, user_id=user)
+        await _log_turn(user, req.session_id, req.message, reply, intent)
+        await asyncio.to_thread(log_chat_event, module="pm", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, intent=intent)
+        return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=_is_reportable(req.message))
+    except Exception as exc:
+        await asyncio.to_thread(log_chat_event, module="pm", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, status="error", error=str(exc))
+        raise
 
 
 # ---------------------------------------------------------------------------
@@ -548,9 +590,17 @@ async def pm_dashboard(project_key: str) -> DashboardResponse:
 
 @app.post("/pm/chat", response_model=ChatResponse)
 async def pm_chat(req: ChatRequest, user: str = Depends(get_current_user)) -> ChatResponse:
-    reply, intent = await _agent.chat(req.session_id, req.message)
-    await _log_turn(user, req.session_id, req.message, reply, intent)
-    return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=_is_reportable(req.message))
+    t0 = time.monotonic()
+    try:
+        reply, intent = await _agent.chat(req.session_id, req.message, user_id=user)
+        await _log_turn(user, req.session_id, req.message, reply, intent)
+        await asyncio.to_thread(log_chat_event, module="pm", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, intent=intent)
+        return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=_is_reportable(req.message))
+    except Exception as exc:
+        await asyncio.to_thread(log_chat_event, module="pm", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, status="error", error=str(exc))
+        raise
 
 
 # ---------------------------------------------------------------------------
@@ -585,13 +635,21 @@ async def pm_chat_stream(req: ChatRequest, user: str = Depends(get_current_user)
     """Stream the agent reply as SSE so the UI can render text as it arrives."""
 
     async def generate():
+        t0 = time.monotonic()
+        error_msg: str | None = None
         try:
-            reply, intent = await _agent.chat(req.session_id, req.message)
+            reply, intent = await _agent.chat(req.session_id, req.message, user_id=user)
         except Exception as exc:
             reply, intent = f"Agent error: {exc}", "default"
+            error_msg = str(exc)
 
         # Archive the turn for the history sidebar before streaming it out.
         await _log_turn(user, req.session_id, req.message, reply, intent)
+        await asyncio.to_thread(
+            log_chat_event, module="pm", user=user, query=req.message,
+            response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id,
+            intent=intent, status="error" if error_msg else "ok", error=error_msg,
+        )
 
         # Tell the client the intent first so it can prepare the right renderer
         yield f"data: {json.dumps({'type': 'start', 'intent': intent})}\n\n"
@@ -611,6 +669,58 @@ async def pm_chat_stream(req: ChatRequest, user: str = Depends(get_current_user)
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",
         },
+    )
+
+
+# ---------------------------------------------------------------------------
+# Talent Management chat endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/talent/chat", response_model=ChatResponse)
+async def talent_chat(req: ChatRequest, user: str = Depends(get_current_user)) -> ChatResponse:
+    t0 = time.monotonic()
+    try:
+        reply, intent = await _talent_agent.chat(req.session_id, req.message, user_id=user)
+        await _log_turn(user, req.session_id, req.message, reply, intent)
+        await asyncio.to_thread(log_chat_event, module="talent", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, intent=intent)
+        return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=False)
+    except Exception as exc:
+        await asyncio.to_thread(log_chat_event, module="talent", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, status="error", error=str(exc))
+        raise
+
+
+@app.post("/talent/chat/stream")
+async def talent_chat_stream(req: ChatRequest, user: str = Depends(get_current_user)) -> StreamingResponse:
+    """Stream talent agent reply as SSE."""
+
+    async def generate():
+        t0 = time.monotonic()
+        error_msg: str | None = None
+        try:
+            reply, intent = await _talent_agent.chat(req.session_id, req.message, user_id=user)
+        except Exception as exc:
+            reply, intent = f"Talent Agent error: {exc}", "talent"
+            error_msg = str(exc)
+
+        await _log_turn(user, req.session_id, req.message, reply, intent)
+        await asyncio.to_thread(
+            log_chat_event, module="talent", user=user, query=req.message,
+            response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id,
+            intent=intent, status="error" if error_msg else "ok", error=error_msg,
+        )
+
+        yield f"data: {json.dumps({'type': 'start', 'intent': intent})}\n\n"
+        chunk = 6
+        for i in range(0, len(reply), chunk):
+            yield f"data: {json.dumps({'type': 'delta', 'delta': reply[i : i + chunk]})}\n\n"
+        yield f"data: {json.dumps({'type': 'done', 'intent': intent, 'full': reply, 'reportable': False})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
     )
 
 

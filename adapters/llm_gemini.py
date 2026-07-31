@@ -15,7 +15,7 @@ from interfaces.llm import LLMClient, LLMResponse, ToolCall, ToolSpec
 
 
 class GeminiClient(LLMClient):
-    def __init__(self, model: str = "gemini-3.1-flash-lite") -> None:
+    def __init__(self, model: str = "gemini-flash-latest") -> None:
         api_key = os.environ["GEMINI_API_KEY"]
         genai.configure(api_key=api_key)
         self.model_name = model
