@@ -44,6 +44,7 @@ from agent.core import Agent
 from talent.agent import TalentAgent
 from talent.routes import router as talent_router
 from shared.auth import create_jwt, decode_jwt, hash_password, verify_password
+from shared.aws_secrets import load_secrets_from_ssm
 from shared.long_term_memory import LongTermMemory
 from shared.observability import log_chat_event, log_request
 from shared.config import (
@@ -56,6 +57,10 @@ from shared.config import (
 )
 
 log = logging.getLogger(__name__)
+
+# On AWS, pull secrets (JWT_SECRET, Jira/Slack) from SSM into env before the
+# stores/clients below read them. No-op locally.
+load_secrets_from_ssm()
 
 _llm = get_llm()
 _store = get_session_store()
