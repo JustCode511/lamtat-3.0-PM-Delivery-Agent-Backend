@@ -64,9 +64,10 @@ _MAX_HISTORY = 16  # keep last 8 turns
 
 
 class TalentAgent:
-    def __init__(self, llm: LLMClient, store: SessionStore) -> None:
+    def __init__(self, llm: LLMClient, store: SessionStore, memory: Any = None) -> None:
         self._llm = llm
         self._store = store
+        self._memory = memory
         self._emp_repo = EmployeeRepository()
         self._proj_repo = ProjectRepository()
         self._alloc_repo = AllocationRepository()
@@ -186,21 +187,33 @@ class TalentAgent:
     # Chat
     # ------------------------------------------------------------------
 
-    async def chat(self, session_id: str, user_message: str) -> tuple[str, str]:
+    async def chat(
+        self,
+        session_id: str,
+        user_message: str,
+        user_id: str | None = None,
+    ) -> tuple[str, str]:
         """Process one user turn and return (reply, intent="talent")."""
         history: list[dict[str, Any]] = self._store.get_history(session_id)
         trimmed = history[-_MAX_HISTORY:] if len(history) > _MAX_HISTORY else history
 
+        # Prepend long-term memory context (session summary + user facts)
+        if self._memory:
+            prefix = self._memory.build_context(session_id, history, user_id)
+            messages_for_llm = (prefix + list(trimmed) if prefix else list(trimmed)) + [
+                {"role": "user", "content": user_message}
+            ]
+        else:
+            messages_for_llm = list(trimmed) + [{"role": "user", "content": user_message}]
+
         context = await asyncio.to_thread(self._build_context)
         system_prompt = _SYSTEM_PROMPT.format(context=context)
-
-        messages = list(trimmed) + [{"role": "user", "content": user_message}]
 
         try:
             response: LLMResponse = await asyncio.to_thread(
                 self._llm.generate,
                 system_prompt,
-                messages,
+                messages_for_llm,
                 [],  # no tools needed — all data is injected in context
             )
             reply = response.text.strip() or "[No response generated.]"
@@ -212,5 +225,13 @@ class TalentAgent:
         history.append({"role": "user", "content": user_message})
         history.append({"role": "assistant", "content": reply})
         self._store.save_history(session_id, history)
+
+        # Fire-and-forget memory update
+        if self._memory:
+            asyncio.create_task(
+                self._memory.update_after_turn(
+                    session_id, user_id, user_message, reply, list(history)
+                )
+            )
 
         return reply, "talent"
