@@ -38,6 +38,7 @@ from pydantic import BaseModel, Field
 
 from agent.core import Agent
 from shared.auth import create_jwt, decode_jwt, hash_password, verify_password
+from shared.aws_secrets import load_secrets_from_ssm
 from shared.config import (
     get_conversation_store,
     get_llm,
@@ -48,6 +49,10 @@ from shared.config import (
 )
 
 log = logging.getLogger(__name__)
+
+# On AWS, pull secrets (JWT_SECRET, Jira/Slack) from SSM into env before the
+# stores/clients below read them. No-op locally.
+load_secrets_from_ssm()
 
 _llm = get_llm()
 _store = get_session_store()
