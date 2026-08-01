@@ -1,0 +1,362 @@
+[
+  {
+    "id": "ALLOC001",
+    "employee_id": "EMP001",
+    "project_id": "AABGFY26",
+    "allocation_pct": 60,
+    "role": "AI Engineer",
+    "start_date": "2026-07-29",
+    "end_date": "2026-10-27",
+    "billable": true
+  },
+  {
+    "id": "ALLOC002",
+    "employee_id": "EMP002",
+    "project_id": "AABGFY26",
+    "allocation_pct": 60,
+    "role": "Full Stack Developer",
+    "start_date": "2026-07-29",
+    "end_date": "2026-08-11",
+    "billable": true
+  },
+  {
+    "id": "ALLOC003",
+    "employee_id": "EMP004",
+    "project_id": "AABGFY26",
+    "allocation_pct": 80,
+    "role": "Frontend Developer",
+    "start_date": "2026-07-31",
+    "end_date": "2026-08-11",
+    "billable": true
+  },
+  {
+    "id": "ALLOC004",
+    "employee_id": "EMP007",
+    "project_id": "AAAP",
+    "allocation_pct": 80,
+    "role": "AI Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2026-12-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC005",
+    "employee_id": "EMP008",
+    "project_id": "AAAP",
+    "allocation_pct": 100,
+    "role": "Backend Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2026-12-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC006",
+    "employee_id": "EMP009",
+    "project_id": "AAAP",
+    "allocation_pct": 100,
+    "role": "Full Stack Developer",
+    "start_date": "2026-07-01",
+    "end_date": "2026-12-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC007",
+    "employee_id": "EMP010",
+    "project_id": "AAAP",
+    "allocation_pct": 80,
+    "role": "DevOps Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2026-12-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC008",
+    "employee_id": "EMP011",
+    "project_id": "AAAP",
+    "allocation_pct": 60,
+    "role": "QA Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2026-12-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC009",
+    "employee_id": "EMP012",
+    "project_id": "PPR",
+    "allocation_pct": 100,
+    "role": "Senior Backend Engineer",
+    "start_date": "2026-06-01",
+    "end_date": "2027-03-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC010",
+    "employee_id": "EMP013",
+    "project_id": "PPR",
+    "allocation_pct": 80,
+    "role": "DevOps Engineer",
+    "start_date": "2026-06-01",
+    "end_date": "2027-03-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC011",
+    "employee_id": "EMP014",
+    "project_id": "PPR",
+    "allocation_pct": 60,
+    "role": "Data Engineer",
+    "start_date": "2026-06-15",
+    "end_date": "2027-03-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC012",
+    "employee_id": "EMP015",
+    "project_id": "PPR",
+    "allocation_pct": 100,
+    "role": "Full Stack Developer",
+    "start_date": "2026-06-01",
+    "end_date": "2027-03-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC013",
+    "employee_id": "EMP016",
+    "project_id": "PPR",
+    "allocation_pct": 80,
+    "role": "Backend Engineer",
+    "start_date": "2026-06-01",
+    "end_date": "2027-03-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC014",
+    "employee_id": "EMP017",
+    "project_id": "PPR",
+    "allocation_pct": 80,
+    "role": "Project Manager",
+    "start_date": "2026-06-01",
+    "end_date": "2027-03-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC015",
+    "employee_id": "EMP018",
+    "project_id": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 80,
+    "role": "Cloud Architect",
+    "start_date": "2026-07-01",
+    "end_date": "2026-09-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC016",
+    "employee_id": "EMP019",
+    "project_id": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 60,
+    "role": "Data Scientist",
+    "start_date": "2026-07-01",
+    "end_date": "2026-09-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC017",
+    "employee_id": "EMP020",
+    "project_id": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 80,
+    "role": "Security Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2026-09-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC018",
+    "employee_id": "EMP021",
+    "project_id": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 60,
+    "role": "Backend Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2026-09-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC019",
+    "employee_id": "EMP022",
+    "project_id": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 100,
+    "role": "Lead Data Engineer",
+    "start_date": "2026-07-15",
+    "end_date": "2026-11-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC020",
+    "employee_id": "EMP023",
+    "project_id": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 80,
+    "role": "AI/ML Engineer",
+    "start_date": "2026-07-15",
+    "end_date": "2026-11-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC021",
+    "employee_id": "EMP024",
+    "project_id": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 60,
+    "role": "Data Scientist",
+    "start_date": "2026-07-15",
+    "end_date": "2026-11-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC022",
+    "employee_id": "EMP025",
+    "project_id": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 100,
+    "role": "Backend Engineer",
+    "start_date": "2026-07-15",
+    "end_date": "2026-11-30",
+    "billable": true
+  },
+  {
+    "id": "ALLOC023",
+    "employee_id": "EMP026",
+    "project_id": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 80,
+    "role": "QA Engineer",
+    "start_date": "2026-08-01",
+    "end_date": "2026-10-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC024",
+    "employee_id": "EMP027",
+    "project_id": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 60,
+    "role": "Data Engineer",
+    "start_date": "2026-08-01",
+    "end_date": "2026-10-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC025",
+    "employee_id": "EMP028",
+    "project_id": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 100,
+    "role": "AI/ML Engineer",
+    "start_date": "2026-08-01",
+    "end_date": "2026-10-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC026",
+    "employee_id": "EMP029",
+    "project_id": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 80,
+    "role": "Full Stack Developer",
+    "start_date": "2026-08-01",
+    "end_date": "2026-10-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC027",
+    "employee_id": "EMP030",
+    "project_id": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 80,
+    "role": "Data Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2027-01-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC028",
+    "employee_id": "EMP031",
+    "project_id": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 100,
+    "role": "Cloud Architect",
+    "start_date": "2026-07-01",
+    "end_date": "2027-01-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC029",
+    "employee_id": "EMP032",
+    "project_id": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 80,
+    "role": "Backend Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2027-01-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC030",
+    "employee_id": "EMP033",
+    "project_id": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 60,
+    "role": "Security Engineer",
+    "start_date": "2026-07-01",
+    "end_date": "2027-01-31",
+    "billable": true
+  },
+  {
+    "id": "ALLOC031",
+    "employee_id": "EMP034",
+    "project_id": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 80,
+    "role": "Lead Security Engineer",
+    "start_date": "2026-07-15",
+    "end_date": "2026-12-15",
+    "billable": true
+  },
+  {
+    "id": "ALLOC032",
+    "employee_id": "EMP035",
+    "project_id": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 80,
+    "role": "DevOps Engineer",
+    "start_date": "2026-07-15",
+    "end_date": "2026-12-15",
+    "billable": true
+  },
+  {
+    "id": "ALLOC033",
+    "employee_id": "EMP036",
+    "project_id": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 60,
+    "role": "Security QA Engineer",
+    "start_date": "2026-07-15",
+    "end_date": "2026-12-15",
+    "billable": true
+  },
+  {
+    "id": "ALLOC034",
+    "employee_id": "EMP037",
+    "project_id": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 100,
+    "role": "Cloud Security Architect",
+    "start_date": "2026-07-15",
+    "end_date": "2026-12-15",
+    "billable": true
+  },
+  {
+    "id": "ALLOC035",
+    "employee_id": "EMP001",
+    "project_id": "AAAP",
+    "allocation_pct": 100,
+    "role": "AI Engineer",
+    "start_date": "2026-07-31",
+    "end_date": "2026-08-11",
+    "billable": true
+  },
+  {
+    "id": "ALLOC036",
+    "employee_id": "EMP002",
+    "project_id": "AAAP",
+    "allocation_pct": 100,
+    "role": "Full Stack Developer",
+    "start_date": "2026-07-31",
+    "end_date": "2026-08-28",
+    "billable": true
+  }
+]

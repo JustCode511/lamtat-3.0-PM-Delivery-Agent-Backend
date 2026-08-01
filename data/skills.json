@@ -1,0 +1,681 @@
+[
+  {
+    "name": "Python",
+    "category": "Backend",
+    "description": "General-purpose programming language widely used in backend, data, and AI/ML development.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "React",
+    "category": "Frontend",
+    "description": "JavaScript library for building user interfaces, component-based UI development.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "TypeScript",
+    "category": "Frontend",
+    "description": "Strongly typed superset of JavaScript improving code quality in frontend and Node.js projects.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Java",
+    "category": "Backend",
+    "description": "Enterprise-grade, statically typed language, dominant in large-scale backend systems.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Spring Boot",
+    "category": "Backend",
+    "description": "Java framework for building production-grade microservices and REST APIs quickly.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "FastAPI",
+    "category": "Backend",
+    "description": "High-performance Python web framework for building APIs with automatic OpenAPI documentation.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Node.js",
+    "category": "Backend",
+    "description": "JavaScript runtime for scalable backend services and real-time applications.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Docker",
+    "category": "Cloud",
+    "description": "Container platform for packaging applications and their dependencies for consistent deployment.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Kubernetes",
+    "category": "Cloud",
+    "description": "Container orchestration platform for automating deployment, scaling, and management of applications.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "AWS",
+    "category": "Cloud",
+    "description": "Amazon Web Services cloud platform covering compute, storage, databases, and ML services.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Azure",
+    "category": "Cloud",
+    "description": "Microsoft cloud platform with strong enterprise integration, DevOps, and hybrid cloud capabilities.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "GCP",
+    "category": "Cloud",
+    "description": "Google Cloud Platform offering data analytics, ML, and scalable compute infrastructure.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Terraform",
+    "category": "Cloud",
+    "description": "Infrastructure as Code tool for provisioning and managing cloud resources declaratively.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Ansible",
+    "category": "Cloud",
+    "description": "Agentless automation tool for configuration management, application deployment, and orchestration.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "CI-CD",
+    "category": "Cloud",
+    "description": "Continuous integration and delivery practices and tooling for automating build, test, and deploy pipelines.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Linux",
+    "category": "Cloud",
+    "description": "Open-source operating system fundamental for server administration and DevOps workflows.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Prometheus",
+    "category": "Cloud",
+    "description": "Open-source monitoring and alerting toolkit for cloud-native and containerised workloads.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Grafana",
+    "category": "Cloud",
+    "description": "Observability and dashboarding platform used alongside Prometheus, Loki, and Tempo.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Helm",
+    "category": "Cloud",
+    "description": "Kubernetes package manager for templating and versioning Kubernetes manifests.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "ArgoCD",
+    "category": "Cloud",
+    "description": "GitOps continuous delivery tool for Kubernetes, enabling declarative application deployments.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Istio",
+    "category": "Cloud",
+    "description": "Service mesh that provides traffic management, observability, and security for microservices.",
+    "demand_level": "low",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "LangChain",
+    "category": "AI-ML",
+    "description": "Framework for building LLM-powered applications with chains, agents, and memory components.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "LangGraph",
+    "category": "AI-ML",
+    "description": "Extension of LangChain for building stateful multi-actor LLM applications using graph primitives.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "TensorFlow",
+    "category": "AI-ML",
+    "description": "Open-source machine learning framework by Google for building and training deep learning models.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "PyTorch",
+    "category": "AI-ML",
+    "description": "Flexible deep learning framework widely used in research and production model development.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Scikit-learn",
+    "category": "AI-ML",
+    "description": "Python ML library providing classical algorithms for classification, regression, and clustering.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "MLflow",
+    "category": "AI-ML",
+    "description": "Open-source platform for managing the complete ML lifecycle including experiment tracking.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "ONNX",
+    "category": "AI-ML",
+    "description": "Open Neural Network Exchange format for interoperability between ML frameworks.",
+    "demand_level": "low",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Ray",
+    "category": "AI-ML",
+    "description": "Distributed computing framework for scaling Python and AI/ML workloads.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "LlamaIndex",
+    "category": "AI-ML",
+    "description": "Data framework for connecting custom data sources to large language models.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Vector Databases",
+    "category": "AI-ML",
+    "description": "Specialised databases (Pinecone, Weaviate, Chroma) for storing and querying vector embeddings.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "OpenAI API",
+    "category": "AI-ML",
+    "description": "REST API for accessing GPT-4, DALL-E, and Whisper models for NLP and generation tasks.",
+    "demand_level": "high",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "Ollama",
+    "category": "AI-ML",
+    "description": "Tool for running large language models locally, enabling offline and private LLM deployments.",
+    "demand_level": "medium",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "Spark",
+    "category": "Data",
+    "description": "Unified analytics engine for large-scale data processing with in-memory computing capabilities.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Databricks",
+    "category": "Data",
+    "description": "Unified data analytics platform combining data engineering, ML, and collaborative notebooks.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Airflow",
+    "category": "Data",
+    "description": "Workflow orchestration platform for scheduling, monitoring, and managing data pipelines.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "dbt",
+    "category": "Data",
+    "description": "Data transformation tool that enables analytics engineers to transform data using SQL.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Delta Lake",
+    "category": "Data",
+    "description": "Open-source storage layer bringing ACID transactions to Apache Spark and big data workloads.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Kafka",
+    "category": "Data",
+    "description": "Distributed event streaming platform for high-throughput, fault-tolerant data pipelines.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "SQL",
+    "category": "Data",
+    "description": "Standard language for managing and querying relational databases across all data roles.",
+    "demand_level": "high",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "PostgreSQL",
+    "category": "Backend",
+    "description": "Powerful open-source relational database with advanced features for enterprise applications.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Redis",
+    "category": "Backend",
+    "description": "In-memory data structure store used for caching, message brokering, and session management.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "MongoDB",
+    "category": "Backend",
+    "description": "Document-oriented NoSQL database for flexible schema, high-volume application data.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Elasticsearch",
+    "category": "Backend",
+    "description": "Distributed search and analytics engine for full-text search and log analysis.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "GraphQL",
+    "category": "Backend",
+    "description": "Query language for APIs providing a flexible, efficient alternative to REST.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "REST APIs",
+    "category": "Backend",
+    "description": "Architectural style for designing networked applications using HTTP methods.",
+    "demand_level": "high",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "Microservices",
+    "category": "Backend",
+    "description": "Architectural approach structuring applications as small, independently deployable services.",
+    "demand_level": "high",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "Django",
+    "category": "Backend",
+    "description": "High-level Python web framework emphasising rapid development and clean design.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Celery",
+    "category": "Backend",
+    "description": "Distributed task queue for Python enabling asynchronous background job processing.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "R",
+    "category": "Data",
+    "description": "Statistical computing language for data analysis, visualisation, and machine learning.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Statistics",
+    "category": "Data",
+    "description": "Mathematical foundation for data analysis, hypothesis testing, and predictive modelling.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Power BI",
+    "category": "Data",
+    "description": "Microsoft business intelligence tool for creating interactive dashboards and reports.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Tableau",
+    "category": "Data",
+    "description": "Data visualisation platform for creating interactive charts, dashboards, and analytics.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "CSS",
+    "category": "Frontend",
+    "description": "Style sheet language for controlling the visual presentation of HTML documents.",
+    "demand_level": "medium",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "Next.js",
+    "category": "Frontend",
+    "description": "React framework for server-side rendering, static generation, and full-stack web development.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Vue.js",
+    "category": "Frontend",
+    "description": "Progressive JavaScript framework for building user interfaces and single-page applications.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Figma",
+    "category": "Frontend",
+    "description": "Collaborative design tool for UI/UX prototyping, wireframing, and handoff to developers.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Tailwind",
+    "category": "Frontend",
+    "description": "Utility-first CSS framework for rapidly building custom user interfaces.",
+    "demand_level": "high",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "Storybook",
+    "category": "Frontend",
+    "description": "Open-source tool for developing UI components in isolation with interactive documentation.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Jest",
+    "category": "Frontend",
+    "description": "JavaScript testing framework for unit and integration testing of React and Node.js applications.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Angular",
+    "category": "Frontend",
+    "description": "TypeScript-based web application framework by Google for enterprise-grade SPAs.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "CISSP",
+    "category": "Security",
+    "description": "Certified Information Systems Security Professional — gold-standard security certification.",
+    "demand_level": "high",
+    "avg_experience_needed": 5
+  },
+  {
+    "name": "CEH",
+    "category": "Security",
+    "description": "Certified Ethical Hacker certification covering penetration testing methodologies.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "CISM",
+    "category": "Security",
+    "description": "Certified Information Security Manager — management-focused security certification.",
+    "demand_level": "medium",
+    "avg_experience_needed": 5
+  },
+  {
+    "name": "OSCP",
+    "category": "Security",
+    "description": "Offensive Security Certified Professional — hands-on penetration testing certification.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "CCSP",
+    "category": "Security",
+    "description": "Certified Cloud Security Professional certification for cloud security architecture.",
+    "demand_level": "high",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "IAM",
+    "category": "Security",
+    "description": "Identity and Access Management frameworks and tooling for controlling resource access.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "SIEM",
+    "category": "Security",
+    "description": "Security Information and Event Management for real-time threat detection and response.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Zero Trust",
+    "category": "Security",
+    "description": "Security model eliminating implicit trust; every request is authenticated and authorised.",
+    "demand_level": "high",
+    "avg_experience_needed": 5
+  },
+  {
+    "name": "SOC2",
+    "category": "Security",
+    "description": "Service Organisation Control 2 compliance framework for data security and availability.",
+    "demand_level": "high",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "Penetration Testing",
+    "category": "Security",
+    "description": "Simulated cyberattacks to identify and remediate security vulnerabilities.",
+    "demand_level": "high",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "Splunk",
+    "category": "Security",
+    "description": "Platform for searching, monitoring, and analysing machine-generated data for security insights.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "OWASP",
+    "category": "Security",
+    "description": "Open Web Application Security Project guidelines and tools for web application security.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Burp Suite",
+    "category": "Security",
+    "description": "Web application security testing platform for finding and exploiting vulnerabilities.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Nessus",
+    "category": "Security",
+    "description": "Vulnerability scanner for identifying security weaknesses across networks and systems.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "CrowdStrike",
+    "category": "Security",
+    "description": "Cloud-native endpoint security platform for threat intelligence and incident response.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Selenium",
+    "category": "Quality",
+    "description": "Browser automation framework for functional and regression testing of web applications.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Cypress",
+    "category": "Quality",
+    "description": "Fast, reliable end-to-end testing framework for modern JavaScript web applications.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Pytest",
+    "category": "Quality",
+    "description": "Python testing framework for writing simple to complex test cases with rich plugin support.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "TestRail",
+    "category": "Quality",
+    "description": "Test case management tool for planning, tracking, and organising software testing efforts.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Postman",
+    "category": "Quality",
+    "description": "API development and testing platform for designing, testing, and documenting APIs.",
+    "demand_level": "medium",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "JMeter",
+    "category": "Quality",
+    "description": "Load testing tool for measuring performance and stress testing of applications.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "API Testing",
+    "category": "Quality",
+    "description": "Validation of API contracts, response formats, and error handling through automated tests.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Performance Testing",
+    "category": "Quality",
+    "description": "Evaluating system responsiveness, stability, and scalability under various load conditions.",
+    "demand_level": "medium",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Agile",
+    "category": "Management",
+    "description": "Iterative software development methodology emphasising collaboration, flexibility, and delivery.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Scrum",
+    "category": "Management",
+    "description": "Agile framework for managing complex projects using sprints, ceremonies, and defined roles.",
+    "demand_level": "high",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "PMP",
+    "category": "Management",
+    "description": "Project Management Professional certification for managing projects across industries.",
+    "demand_level": "high",
+    "avg_experience_needed": 5
+  },
+  {
+    "name": "PMI-ACP",
+    "category": "Management",
+    "description": "PMI Agile Certified Practitioner demonstrating knowledge of agile principles and practices.",
+    "demand_level": "medium",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "Risk Management",
+    "category": "Management",
+    "description": "Identifying, assessing, and mitigating risks throughout the project lifecycle.",
+    "demand_level": "high",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "Stakeholder Management",
+    "category": "Management",
+    "description": "Engaging, communicating with, and managing expectations of project stakeholders.",
+    "demand_level": "high",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "JIRA",
+    "category": "Management",
+    "description": "Project tracking and issue management tool widely used in agile software development.",
+    "demand_level": "high",
+    "avg_experience_needed": 1
+  },
+  {
+    "name": "CKA",
+    "category": "Cloud",
+    "description": "Certified Kubernetes Administrator certification validating Kubernetes administration skills.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Machine Learning",
+    "category": "AI-ML",
+    "description": "Techniques enabling systems to learn from data and make predictions without explicit programming.",
+    "demand_level": "high",
+    "avg_experience_needed": 3
+  },
+  {
+    "name": "Architecture",
+    "category": "Cloud",
+    "description": "Design of scalable, resilient, and secure system architectures for enterprise applications.",
+    "demand_level": "high",
+    "avg_experience_needed": 7
+  },
+  {
+    "name": "Cost Optimization",
+    "category": "Cloud",
+    "description": "Strategies and practices for reducing cloud infrastructure spend without sacrificing performance.",
+    "demand_level": "medium",
+    "avg_experience_needed": 4
+  },
+  {
+    "name": "Pinecone",
+    "category": "AI-ML",
+    "description": "Managed vector database service optimised for semantic search and similarity retrieval.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  },
+  {
+    "name": "Accessibility",
+    "category": "Frontend",
+    "description": "WCAG standards and practices for making web applications usable by people with disabilities.",
+    "demand_level": "medium",
+    "avg_experience_needed": 2
+  }
+]

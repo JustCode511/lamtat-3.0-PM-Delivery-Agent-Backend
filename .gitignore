@@ -10,8 +10,14 @@ __pycache__/
 venv/
 env/
 
-# Local data store
-data/
+# Runtime state — never commit (generated at runtime, may contain PII or secrets)
+data/sessions/
+data/session_summaries/
+data/user_memory/
+data/conversations.json
+data/users.json
+data/revoked_tokens.json
+# data/employees.json, projects.json, allocations.json, skills.json are committed as seed data
 
 # OS files
 .DS_Store

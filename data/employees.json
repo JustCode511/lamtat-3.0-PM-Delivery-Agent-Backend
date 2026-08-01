@@ -1,0 +1,2270 @@
+[
+  {
+    "id": "EMP001",
+    "name": "Parth Kansara",
+    "email": "parth.kansara@accenture.com",
+    "designation": "AI Engineer",
+    "department": "Engineering",
+    "location": "Singapore",
+    "country": "India",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "Python",
+      "LangChain",
+      "React",
+      "FastAPI",
+      "LangGraph"
+    ],
+    "secondary_skills": [
+      "TypeScript",
+      "Docker",
+      "AWS",
+      "PostgreSQL"
+    ],
+    "certifications": [
+      "AWS Certified Developer"
+    ],
+    "experience_years": 5,
+    "join_date": "2022-01-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L4",
+    "preferred_projects": [
+      "AI/ML",
+      "Backend",
+      "FullStack"
+    ],
+    "current_project": "AAAP",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-08-11",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP002",
+    "name": "Chaitanya Kumar",
+    "email": "chaitanya.kumar@accenture.com",
+    "designation": "Full Stack Developer",
+    "department": "Engineering",
+    "location": "Singapore",
+    "country": "India",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "Java",
+      "Spring Boot",
+      "React",
+      "TypeScript"
+    ],
+    "secondary_skills": [
+      "Python",
+      "Docker",
+      "PostgreSQL",
+      "Kubernetes"
+    ],
+    "certifications": [
+      "Oracle Certified Java Professional"
+    ],
+    "experience_years": 4,
+    "join_date": "2022-06-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L3",
+    "preferred_projects": [
+      "FullStack",
+      "Enterprise",
+      "Digital"
+    ],
+    "current_project": "AAAP",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-08-28",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP003",
+    "name": "Ismail Januardi",
+    "email": "ismail.januardi@accenture.com",
+    "designation": "Cloud Manager",
+    "department": "Management",
+    "location": "Jakarta",
+    "country": "Indonesia",
+    "manager": null,
+    "primary_skills": [
+      "AWS",
+      "Kubernetes",
+      "Terraform",
+      "Ollama",
+      "Linux"
+    ],
+    "secondary_skills": [
+      "Azure",
+      "Docker",
+      "CI-CD",
+      "Python",
+      "Ansible"
+    ],
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "CKA"
+    ],
+    "experience_years": 10,
+    "join_date": "2018-03-01",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Cloud Migration",
+      "Infrastructure",
+      "Platform"
+    ],
+    "current_project": null,
+    "allocation_pct": 40,
+    "availability_pct": 60,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 24,
+    "capacity_hours": 24,
+    "utilization_pct": 40
+  },
+  {
+    "id": "EMP004",
+    "name": "Rachel Gnanaraj",
+    "email": "rachel.gnanaraj@accenture.com",
+    "designation": "Frontend Developer",
+    "department": "Engineering",
+    "location": "Singapore",
+    "country": "India",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "React",
+      "TypeScript",
+      "CSS",
+      "Next.js",
+      "Figma"
+    ],
+    "secondary_skills": [
+      "Vue.js",
+      "Tailwind",
+      "HTML5",
+      "Storybook",
+      "Accessibility"
+    ],
+    "certifications": [],
+    "experience_years": 3,
+    "join_date": "2023-01-10",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Frontend",
+      "Design Systems",
+      "Consumer Apps"
+    ],
+    "current_project": "AABGFY26",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-08-11",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP005",
+    "name": "John Doe",
+    "email": "john.doe@accenture.com",
+    "designation": "Java Developer",
+    "department": "Engineering",
+    "location": "New York",
+    "country": "USA",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "Java",
+      "Spring Boot",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "secondary_skills": [
+      "MySQL",
+      "Kafka",
+      "Microservices",
+      "Maven"
+    ],
+    "certifications": [],
+    "experience_years": 4,
+    "join_date": "2022-09-01",
+    "status": "bench",
+    "bench": true,
+    "billable": false,
+    "cost_center": "CC002",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Enterprise Backend",
+      "FinTech",
+      "Java"
+    ],
+    "current_project": null,
+    "allocation_pct": 25,
+    "availability_pct": 75,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 30,
+    "capacity_hours": 30,
+    "utilization_pct": 25
+  },
+  {
+    "id": "EMP006",
+    "name": "Jane Doe",
+    "email": "jane.doe@accenture.com",
+    "designation": "Senior Frontend Developer",
+    "department": "Engineering",
+    "location": "New York",
+    "country": "USA",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "React",
+      "Vue.js",
+      "TypeScript",
+      "CSS",
+      "Jest"
+    ],
+    "secondary_skills": [
+      "Angular",
+      "Next.js",
+      "GraphQL",
+      "Webpack",
+      "Vite"
+    ],
+    "certifications": [],
+    "experience_years": 5,
+    "join_date": "2021-11-15",
+    "status": "bench",
+    "bench": true,
+    "billable": false,
+    "cost_center": "CC002",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Frontend",
+      "Consumer Apps",
+      "UI Engineering"
+    ],
+    "current_project": null,
+    "allocation_pct": 25,
+    "availability_pct": 75,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 30,
+    "capacity_hours": 30,
+    "utilization_pct": 25
+  },
+  {
+    "id": "EMP007",
+    "name": "Priya Sharma",
+    "email": "priya.sharma@accenture.com",
+    "designation": "AI Engineer",
+    "department": "Engineering",
+    "location": "Bangalore",
+    "country": "India",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "Python",
+      "TensorFlow",
+      "PyTorch",
+      "Scikit-learn",
+      "FastAPI"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "AWS",
+      "MLflow",
+      "Jupyter",
+      "SQL"
+    ],
+    "certifications": [
+      "AWS Machine Learning Specialty"
+    ],
+    "experience_years": 4,
+    "join_date": "2022-03-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L3",
+    "preferred_projects": [
+      "AI/ML",
+      "Innovation",
+      "Enterprise AI"
+    ],
+    "current_project": "AAAP",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-12-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP008",
+    "name": "Wei Chen",
+    "email": "wei.chen@accenture.com",
+    "designation": "Backend Engineer",
+    "department": "Engineering",
+    "location": "Shanghai",
+    "country": "China",
+    "manager": "James Liu",
+    "primary_skills": [
+      "Java",
+      "Spring Boot",
+      "PostgreSQL",
+      "Docker",
+      "Kubernetes"
+    ],
+    "secondary_skills": [
+      "Python",
+      "Redis",
+      "Kafka",
+      "Elasticsearch",
+      "Maven"
+    ],
+    "certifications": [
+      "Oracle Certified Java Professional"
+    ],
+    "experience_years": 6,
+    "join_date": "2020-07-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Enterprise Backend",
+      "Cloud Native",
+      "FinTech"
+    ],
+    "current_project": "AAAP",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-12-31",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP009",
+    "name": "Sofia Martinez",
+    "email": "sofia.martinez@accenture.com",
+    "designation": "Full Stack Developer",
+    "department": "Engineering",
+    "location": "Madrid",
+    "country": "Spain",
+    "manager": "James Liu",
+    "primary_skills": [
+      "Python",
+      "FastAPI",
+      "React",
+      "TypeScript",
+      "PostgreSQL"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "AWS",
+      "Redis",
+      "GraphQL",
+      "Jest"
+    ],
+    "certifications": [],
+    "experience_years": 3,
+    "join_date": "2023-04-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L3",
+    "preferred_projects": [
+      "FullStack",
+      "Digital",
+      "AI/ML"
+    ],
+    "current_project": "AAAP",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-12-31",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP010",
+    "name": "Kwame Asante",
+    "email": "kwame.asante@accenture.com",
+    "designation": "DevOps Engineer",
+    "department": "Engineering",
+    "location": "Accra",
+    "country": "Ghana",
+    "manager": "James Liu",
+    "primary_skills": [
+      "AWS",
+      "Kubernetes",
+      "Terraform",
+      "CI-CD",
+      "Linux"
+    ],
+    "secondary_skills": [
+      "Azure",
+      "Docker",
+      "Ansible",
+      "Python",
+      "Prometheus"
+    ],
+    "certifications": [
+      "AWS DevOps Engineer Professional"
+    ],
+    "experience_years": 5,
+    "join_date": "2021-08-10",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Cloud Migration",
+      "Infrastructure",
+      "DevOps"
+    ],
+    "current_project": "AAAP",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-12-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP011",
+    "name": "Yuki Tanaka",
+    "email": "yuki.tanaka@accenture.com",
+    "designation": "QA Engineer",
+    "department": "Engineering",
+    "location": "Tokyo",
+    "country": "Japan",
+    "manager": "James Liu",
+    "primary_skills": [
+      "Selenium",
+      "Cypress",
+      "Pytest",
+      "JIRA",
+      "TestRail"
+    ],
+    "secondary_skills": [
+      "Python",
+      "JavaScript",
+      "Postman",
+      "Newman",
+      "Allure"
+    ],
+    "certifications": [
+      "ISTQB Certified Tester"
+    ],
+    "experience_years": 4,
+    "join_date": "2022-01-20",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Quality",
+      "Test Automation",
+      "Enterprise"
+    ],
+    "current_project": "AAAP",
+    "allocation_pct": 70,
+    "availability_pct": 30,
+    "availability_date": "2026-12-31",
+    "weekly_capacity": 12,
+    "capacity_hours": 12,
+    "utilization_pct": 70
+  },
+  {
+    "id": "EMP012",
+    "name": "Arjun Nair",
+    "email": "arjun.nair@accenture.com",
+    "designation": "Senior Backend Engineer",
+    "department": "Engineering",
+    "location": "Hyderabad",
+    "country": "India",
+    "manager": "Priya Patel",
+    "primary_skills": [
+      "Java",
+      "Spring Boot",
+      "Kubernetes",
+      "Docker",
+      "PostgreSQL"
+    ],
+    "secondary_skills": [
+      "Kafka",
+      "Redis",
+      "Elasticsearch",
+      "Maven",
+      "JUnit"
+    ],
+    "certifications": [
+      "Oracle Certified Java Professional",
+      "CKA"
+    ],
+    "experience_years": 7,
+    "join_date": "2019-05-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Enterprise Backend",
+      "Platform",
+      "Java"
+    ],
+    "current_project": "PPR",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2027-03-31",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP013",
+    "name": "Laura Fernandez",
+    "email": "laura.fernandez@accenture.com",
+    "designation": "DevOps Engineer",
+    "department": "Engineering",
+    "location": "Milan",
+    "country": "Italy",
+    "manager": "Priya Patel",
+    "primary_skills": [
+      "Kubernetes",
+      "Terraform",
+      "AWS",
+      "CI-CD",
+      "Docker"
+    ],
+    "secondary_skills": [
+      "Azure",
+      "GCP",
+      "Ansible",
+      "Python",
+      "Prometheus"
+    ],
+    "certifications": [
+      "CKA",
+      "AWS DevOps Engineer Professional"
+    ],
+    "experience_years": 5,
+    "join_date": "2021-03-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Infrastructure",
+      "Cloud Native",
+      "DevOps"
+    ],
+    "current_project": "PPR",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2027-03-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP014",
+    "name": "Ahmed Hassan",
+    "email": "ahmed.hassan@accenture.com",
+    "designation": "Data Engineer",
+    "department": "Data",
+    "location": "Cairo",
+    "country": "Egypt",
+    "manager": "Priya Patel",
+    "primary_skills": [
+      "Python",
+      "Spark",
+      "PostgreSQL",
+      "Airflow",
+      "SQL"
+    ],
+    "secondary_skills": [
+      "Databricks",
+      "Kafka",
+      "Docker",
+      "dbt",
+      "AWS"
+    ],
+    "certifications": [
+      "AWS Data Analytics Specialty"
+    ],
+    "experience_years": 4,
+    "join_date": "2022-07-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Data Platform",
+      "Analytics",
+      "Cloud Data"
+    ],
+    "current_project": "PPR",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2027-03-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP015",
+    "name": "Emma Wilson",
+    "email": "emma.wilson@accenture.com",
+    "designation": "Full Stack Developer",
+    "department": "Engineering",
+    "location": "London",
+    "country": "UK",
+    "manager": "Priya Patel",
+    "primary_skills": [
+      "React",
+      "Node.js",
+      "TypeScript",
+      "GraphQL",
+      "PostgreSQL"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "AWS",
+      "Redis",
+      "Next.js",
+      "MongoDB"
+    ],
+    "certifications": [],
+    "experience_years": 5,
+    "join_date": "2021-09-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L4",
+    "preferred_projects": [
+      "FullStack",
+      "Digital",
+      "Enterprise"
+    ],
+    "current_project": "PPR",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2027-03-31",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP016",
+    "name": "Carlos Santos",
+    "email": "carlos.santos@accenture.com",
+    "designation": "Backend Engineer",
+    "department": "Engineering",
+    "location": "São Paulo",
+    "country": "Brazil",
+    "manager": "Priya Patel",
+    "primary_skills": [
+      "Java",
+      "Spring Boot",
+      "Kafka",
+      "Docker",
+      "PostgreSQL"
+    ],
+    "secondary_skills": [
+      "Python",
+      "Redis",
+      "Elasticsearch",
+      "Maven",
+      "JUnit"
+    ],
+    "certifications": [],
+    "experience_years": 4,
+    "join_date": "2022-08-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC002",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Enterprise Backend",
+      "FinTech",
+      "Java"
+    ],
+    "current_project": "PPR",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2027-03-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP017",
+    "name": "Aisha Kofi",
+    "email": "aisha.kofi@accenture.com",
+    "designation": "Project Manager",
+    "department": "Management",
+    "location": "Accra",
+    "country": "Ghana",
+    "manager": "Priya Patel",
+    "primary_skills": [
+      "Agile",
+      "Scrum",
+      "JIRA",
+      "Risk Management",
+      "Stakeholder Management"
+    ],
+    "secondary_skills": [
+      "Confluence",
+      "MS Project",
+      "Power BI",
+      "Slack",
+      "Trello"
+    ],
+    "certifications": [
+      "PMP",
+      "PMI-ACP"
+    ],
+    "experience_years": 8,
+    "join_date": "2019-01-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Enterprise",
+      "Agile Transformation",
+      "Digital Transformation"
+    ],
+    "current_project": "PPR",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2027-03-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP018",
+    "name": "Dmitri Volkov",
+    "email": "dmitri.volkov@accenture.com",
+    "designation": "Cloud Architect",
+    "department": "Engineering",
+    "location": "Warsaw",
+    "country": "Poland",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "AWS",
+      "Azure",
+      "Kubernetes",
+      "Terraform",
+      "Architecture"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "Python",
+      "Ansible",
+      "GCP",
+      "Microservices"
+    ],
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "Azure Solutions Architect Expert"
+    ],
+    "experience_years": 9,
+    "join_date": "2018-06-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Cloud Migration",
+      "Enterprise Cloud",
+      "Infrastructure"
+    ],
+    "current_project": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-09-30",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP019",
+    "name": "Mei Lin",
+    "email": "mei.lin@accenture.com",
+    "designation": "Data Scientist",
+    "department": "Data",
+    "location": "Beijing",
+    "country": "China",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "TensorFlow",
+      "Scikit-learn",
+      "SQL",
+      "Statistics"
+    ],
+    "secondary_skills": [
+      "R",
+      "Spark",
+      "Jupyter",
+      "MLflow",
+      "Power BI"
+    ],
+    "certifications": [
+      "TensorFlow Developer Certificate"
+    ],
+    "experience_years": 5,
+    "join_date": "2021-05-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Analytics",
+      "AI/ML",
+      "Data Platform"
+    ],
+    "current_project": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 75,
+    "availability_pct": 25,
+    "availability_date": "2026-09-30",
+    "weekly_capacity": 10,
+    "capacity_hours": 10,
+    "utilization_pct": 75
+  },
+  {
+    "id": "EMP020",
+    "name": "Fatima Al-Rashid",
+    "email": "fatima.al-rashid@accenture.com",
+    "designation": "Security Engineer",
+    "department": "Engineering",
+    "location": "Dubai",
+    "country": "UAE",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "Penetration Testing",
+      "SIEM",
+      "IAM",
+      "AWS Security",
+      "CISSP"
+    ],
+    "secondary_skills": [
+      "Nessus",
+      "Wireshark",
+      "Python",
+      "Splunk",
+      "SOC2"
+    ],
+    "certifications": [
+      "CISSP",
+      "CEH"
+    ],
+    "experience_years": 7,
+    "join_date": "2020-01-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Security",
+      "Compliance",
+      "FinServe"
+    ],
+    "current_project": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-09-30",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP021",
+    "name": "Tomas Novak",
+    "email": "tomas.novak@accenture.com",
+    "designation": "Backend Engineer",
+    "department": "Engineering",
+    "location": "Lisbon",
+    "country": "Portugal",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "FastAPI",
+      "Docker",
+      "PostgreSQL",
+      "Redis"
+    ],
+    "secondary_skills": [
+      "Kubernetes",
+      "AWS",
+      "Celery",
+      "SQLAlchemy",
+      "pytest"
+    ],
+    "certifications": [],
+    "experience_years": 4,
+    "join_date": "2022-05-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Backend",
+      "Cloud Native",
+      "Platform"
+    ],
+    "current_project": "CLOUD-MIGRATION-Q3",
+    "allocation_pct": 75,
+    "availability_pct": 25,
+    "availability_date": "2026-09-30",
+    "weekly_capacity": 10,
+    "capacity_hours": 10,
+    "utilization_pct": 75
+  },
+  {
+    "id": "EMP022",
+    "name": "Nkechi Obi",
+    "email": "nkechi.obi@accenture.com",
+    "designation": "Data Engineer",
+    "department": "Data",
+    "location": "Lagos",
+    "country": "Nigeria",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "Python",
+      "Spark",
+      "Databricks",
+      "SQL",
+      "Airflow"
+    ],
+    "secondary_skills": [
+      "Kafka",
+      "Delta Lake",
+      "dbt",
+      "AWS",
+      "Docker"
+    ],
+    "certifications": [
+      "Databricks Certified Data Engineer Associate"
+    ],
+    "experience_years": 6,
+    "join_date": "2020-11-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Data Platform",
+      "Analytics",
+      "Cloud Data"
+    ],
+    "current_project": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-11-30",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP023",
+    "name": "Hiroshi Yamamoto",
+    "email": "hiroshi.yamamoto@accenture.com",
+    "designation": "AI/ML Engineer",
+    "department": "Engineering",
+    "location": "Osaka",
+    "country": "Japan",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "PyTorch",
+      "TensorFlow",
+      "LangChain",
+      "MLflow"
+    ],
+    "secondary_skills": [
+      "Kubernetes",
+      "Docker",
+      "FastAPI",
+      "ONNX",
+      "Ray"
+    ],
+    "certifications": [
+      "AWS Machine Learning Specialty"
+    ],
+    "experience_years": 5,
+    "join_date": "2021-10-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L4",
+    "preferred_projects": [
+      "AI/ML",
+      "Innovation",
+      "Enterprise AI"
+    ],
+    "current_project": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-11-30",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP024",
+    "name": "Dilnoza Yusupova",
+    "email": "dilnoza.yusupova@accenture.com",
+    "designation": "Data Scientist",
+    "department": "Data",
+    "location": "Sofia",
+    "country": "Bulgaria",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "Python",
+      "R",
+      "Scikit-learn",
+      "Statistics",
+      "Power BI"
+    ],
+    "secondary_skills": [
+      "SQL",
+      "TensorFlow",
+      "Excel",
+      "Tableau",
+      "Spark"
+    ],
+    "certifications": [],
+    "experience_years": 3,
+    "join_date": "2023-02-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Analytics",
+      "Data Science",
+      "Reporting"
+    ],
+    "current_project": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 75,
+    "availability_pct": 25,
+    "availability_date": "2026-11-30",
+    "weekly_capacity": 10,
+    "capacity_hours": 10,
+    "utilization_pct": 75
+  },
+  {
+    "id": "EMP025",
+    "name": "Olamide Adeyemi",
+    "email": "olamide.adeyemi@accenture.com",
+    "designation": "Backend Engineer",
+    "department": "Engineering",
+    "location": "Lagos",
+    "country": "Nigeria",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "Python",
+      "Django",
+      "PostgreSQL",
+      "Docker",
+      "REST APIs"
+    ],
+    "secondary_skills": [
+      "Celery",
+      "Redis",
+      "AWS",
+      "Nginx",
+      "pytest"
+    ],
+    "certifications": [],
+    "experience_years": 4,
+    "join_date": "2022-09-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Backend",
+      "FinTech",
+      "Enterprise"
+    ],
+    "current_project": "DATA-PLATFORM-REBUILD",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-11-30",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP026",
+    "name": "Valentina Rossi",
+    "email": "valentina.rossi@accenture.com",
+    "designation": "QA Engineer",
+    "department": "Engineering",
+    "location": "Lyon",
+    "country": "France",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Selenium",
+      "Pytest",
+      "TestRail",
+      "JIRA",
+      "API Testing"
+    ],
+    "secondary_skills": [
+      "Python",
+      "Postman",
+      "Cypress",
+      "Performance Testing",
+      "JMeter"
+    ],
+    "certifications": [
+      "ISTQB Advanced Level Test Analyst"
+    ],
+    "experience_years": 5,
+    "join_date": "2021-07-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Quality",
+      "Test Automation",
+      "Enterprise"
+    ],
+    "current_project": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-10-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP027",
+    "name": "Kwabena Mensah",
+    "email": "kwabena.mensah@accenture.com",
+    "designation": "Data Engineer",
+    "department": "Data",
+    "location": "Seoul",
+    "country": "South Korea",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "Python",
+      "Airflow",
+      "Spark",
+      "SQL",
+      "dbt"
+    ],
+    "secondary_skills": [
+      "AWS",
+      "Databricks",
+      "Kafka",
+      "Docker",
+      "PostgreSQL"
+    ],
+    "certifications": [],
+    "experience_years": 3,
+    "join_date": "2023-05-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Data Platform",
+      "Analytics",
+      "Cloud Data"
+    ],
+    "current_project": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 70,
+    "availability_pct": 30,
+    "availability_date": "2026-10-31",
+    "weekly_capacity": 12,
+    "capacity_hours": 12,
+    "utilization_pct": 70
+  },
+  {
+    "id": "EMP028",
+    "name": "Elena Petrova",
+    "email": "elena.petrova@accenture.com",
+    "designation": "AI/ML Engineer",
+    "department": "Engineering",
+    "location": "Kyiv",
+    "country": "Ukraine",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "LangChain",
+      "OpenAI API",
+      "FastAPI",
+      "Vector Databases"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "AWS",
+      "PostgreSQL",
+      "Pinecone",
+      "LlamaIndex"
+    ],
+    "certifications": [],
+    "experience_years": 4,
+    "join_date": "2022-12-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L3",
+    "preferred_projects": [
+      "AI/ML",
+      "LLM",
+      "Innovation"
+    ],
+    "current_project": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-10-31",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP029",
+    "name": "Marcus Thompson",
+    "email": "marcus.thompson@accenture.com",
+    "designation": "Full Stack Developer",
+    "department": "Engineering",
+    "location": "Chicago",
+    "country": "USA",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "React",
+      "Node.js",
+      "TypeScript",
+      "GraphQL",
+      "MongoDB"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "AWS",
+      "Jest",
+      "Next.js",
+      "Redis"
+    ],
+    "certifications": [],
+    "experience_years": 6,
+    "join_date": "2020-06-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC002",
+    "career_level": "L4",
+    "preferred_projects": [
+      "FullStack",
+      "Consumer Apps",
+      "Digital"
+    ],
+    "current_project": "AI-ASSISTANT-PILOT",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-10-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP030",
+    "name": "Yaw Darko",
+    "email": "yaw.darko@accenture.com",
+    "designation": "Data Engineer",
+    "department": "Data",
+    "location": "Brussels",
+    "country": "Belgium",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "Python",
+      "Databricks",
+      "Delta Lake",
+      "Airflow",
+      "SQL"
+    ],
+    "secondary_skills": [
+      "Spark",
+      "Kafka",
+      "AWS",
+      "dbt",
+      "Docker"
+    ],
+    "certifications": [
+      "Databricks Certified Associate Developer for Apache Spark"
+    ],
+    "experience_years": 4,
+    "join_date": "2022-10-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Data Platform",
+      "Analytics",
+      "Cloud Data"
+    ],
+    "current_project": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2027-01-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP031",
+    "name": "Isabella Conti",
+    "email": "isabella.conti@accenture.com",
+    "designation": "Cloud Architect",
+    "department": "Engineering",
+    "location": "Dublin",
+    "country": "Ireland",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "AWS",
+      "GCP",
+      "Kubernetes",
+      "Terraform",
+      "Microservices"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "Istio",
+      "Prometheus",
+      "Python",
+      "Ansible"
+    ],
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "GCP Professional Cloud Architect"
+    ],
+    "experience_years": 8,
+    "join_date": "2019-03-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Cloud Migration",
+      "Infrastructure",
+      "Platform"
+    ],
+    "current_project": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2027-01-31",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP032",
+    "name": "Andrei Popescu",
+    "email": "andrei.popescu@accenture.com",
+    "designation": "Backend Engineer",
+    "department": "Engineering",
+    "location": "Tehran",
+    "country": "Iran",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "Redis",
+      "Docker"
+    ],
+    "secondary_skills": [
+      "Kubernetes",
+      "Celery",
+      "SQLAlchemy",
+      "pytest",
+      "AWS"
+    ],
+    "certifications": [],
+    "experience_years": 5,
+    "join_date": "2021-11-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Backend",
+      "Cloud Native",
+      "FinTech"
+    ],
+    "current_project": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2027-01-31",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP033",
+    "name": "Zara Ahmed",
+    "email": "zara.ahmed@accenture.com",
+    "designation": "Security Engineer",
+    "department": "Engineering",
+    "location": "Mumbai",
+    "country": "India",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "IAM",
+      "SIEM",
+      "Penetration Testing",
+      "CISSP",
+      "Zero Trust"
+    ],
+    "secondary_skills": [
+      "AWS Security",
+      "Splunk",
+      "Python",
+      "SOC2",
+      "Nessus"
+    ],
+    "certifications": [
+      "CISSP",
+      "CISM"
+    ],
+    "experience_years": 6,
+    "join_date": "2020-09-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Security",
+      "Compliance",
+      "GovTech"
+    ],
+    "current_project": "DATA-LAKE-MIGRATION",
+    "allocation_pct": 70,
+    "availability_pct": 30,
+    "availability_date": "2027-01-31",
+    "weekly_capacity": 12,
+    "capacity_hours": 12,
+    "utilization_pct": 70
+  },
+  {
+    "id": "EMP034",
+    "name": "Alejandro Vega",
+    "email": "alejandro.vega@accenture.com",
+    "designation": "Security Engineer",
+    "department": "Engineering",
+    "location": "Bogotá",
+    "country": "Colombia",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Zero Trust",
+      "IAM",
+      "SIEM",
+      "SOC2",
+      "CISSP"
+    ],
+    "secondary_skills": [
+      "AWS Security",
+      "Splunk",
+      "Python",
+      "Nessus",
+      "CrowdStrike"
+    ],
+    "certifications": [
+      "CISSP",
+      "CCSP"
+    ],
+    "experience_years": 7,
+    "join_date": "2020-04-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC002",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Security",
+      "Zero Trust",
+      "GovTech"
+    ],
+    "current_project": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-12-15",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP035",
+    "name": "Sun Li",
+    "email": "sun.li@accenture.com",
+    "designation": "DevOps Engineer",
+    "department": "Engineering",
+    "location": "Singapore",
+    "country": "Singapore",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "Kubernetes",
+      "Docker",
+      "CI-CD",
+      "AWS",
+      "Terraform"
+    ],
+    "secondary_skills": [
+      "Prometheus",
+      "Grafana",
+      "Python",
+      "Helm",
+      "ArgoCD"
+    ],
+    "certifications": [
+      "CKA",
+      "AWS DevOps Engineer Professional"
+    ],
+    "experience_years": 5,
+    "join_date": "2021-06-15",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Infrastructure",
+      "Cloud Native",
+      "Platform"
+    ],
+    "current_project": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-12-15",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP036",
+    "name": "Kofi Mensah",
+    "email": "kofi.mensah@accenture.com",
+    "designation": "Security QA Engineer",
+    "department": "Engineering",
+    "location": "Chennai",
+    "country": "India",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Penetration Testing",
+      "SIEM",
+      "Security Testing",
+      "OWASP",
+      "Burp Suite"
+    ],
+    "secondary_skills": [
+      "Python",
+      "Nessus",
+      "Metasploit",
+      "JIRA",
+      "Selenium"
+    ],
+    "certifications": [
+      "CEH",
+      "OSCP"
+    ],
+    "experience_years": 5,
+    "join_date": "2021-04-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Security",
+      "Quality",
+      "GovTech"
+    ],
+    "current_project": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 80,
+    "availability_pct": 20,
+    "availability_date": "2026-12-15",
+    "weekly_capacity": 8,
+    "capacity_hours": 8,
+    "utilization_pct": 80
+  },
+  {
+    "id": "EMP037",
+    "name": "Natasha Ivanova",
+    "email": "natasha.ivanova@accenture.com",
+    "designation": "Cloud Architect",
+    "department": "Engineering",
+    "location": "Paris",
+    "country": "France",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "Azure",
+      "AWS",
+      "Kubernetes",
+      "Terraform",
+      "Zero Trust"
+    ],
+    "secondary_skills": [
+      "GCP",
+      "Docker",
+      "Python",
+      "Ansible",
+      "Istio"
+    ],
+    "certifications": [
+      "Azure Solutions Architect Expert",
+      "AWS Solutions Architect Professional"
+    ],
+    "experience_years": 8,
+    "join_date": "2019-07-01",
+    "status": "allocated",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Cloud Migration",
+      "Enterprise Cloud",
+      "Security"
+    ],
+    "current_project": "ZERO-TRUST-SECURITY",
+    "allocation_pct": 100,
+    "availability_pct": 0,
+    "availability_date": "2026-12-15",
+    "weekly_capacity": 0,
+    "capacity_hours": 0,
+    "utilization_pct": 100
+  },
+  {
+    "id": "EMP038",
+    "name": "David Kim",
+    "email": "david.kim@accenture.com",
+    "designation": "Backend Engineer",
+    "department": "Engineering",
+    "location": "Berlin",
+    "country": "Germany",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Java",
+      "Spring Boot",
+      "PostgreSQL",
+      "Docker",
+      "REST APIs"
+    ],
+    "secondary_skills": [
+      "Redis",
+      "Kafka",
+      "AWS",
+      "Maven",
+      "JUnit"
+    ],
+    "certifications": [],
+    "experience_years": 4,
+    "join_date": "2022-04-01",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Enterprise Backend",
+      "FinTech",
+      "Java"
+    ],
+    "current_project": null,
+    "allocation_pct": 40,
+    "availability_pct": 60,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 24,
+    "capacity_hours": 24,
+    "utilization_pct": 40
+  },
+  {
+    "id": "EMP039",
+    "name": "Amara Diallo",
+    "email": "amara.diallo@accenture.com",
+    "designation": "Frontend Developer",
+    "department": "Engineering",
+    "location": "Singapore",
+    "country": "Singapore",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "React",
+      "TypeScript",
+      "CSS",
+      "Next.js",
+      "HTML5"
+    ],
+    "secondary_skills": [
+      "Vue.js",
+      "Tailwind",
+      "Jest",
+      "Figma",
+      "Storybook"
+    ],
+    "certifications": [],
+    "experience_years": 3,
+    "join_date": "2023-03-01",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC003",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Frontend",
+      "Consumer Apps",
+      "Design Systems"
+    ],
+    "current_project": null,
+    "allocation_pct": 40,
+    "availability_pct": 60,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 24,
+    "capacity_hours": 24,
+    "utilization_pct": 40
+  },
+  {
+    "id": "EMP040",
+    "name": "Ranjit Singh",
+    "email": "ranjit.singh@accenture.com",
+    "designation": "Cloud Architect",
+    "department": "Engineering",
+    "location": "Delhi",
+    "country": "India",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "AWS",
+      "Azure",
+      "Kubernetes",
+      "Terraform",
+      "Architecture"
+    ],
+    "secondary_skills": [
+      "Docker",
+      "GCP",
+      "Python",
+      "Ansible",
+      "Cost Optimization"
+    ],
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "AZ-305"
+    ],
+    "experience_years": 9,
+    "join_date": "2018-02-15",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L5",
+    "preferred_projects": [
+      "Cloud Migration",
+      "Enterprise Cloud",
+      "Platform"
+    ],
+    "current_project": null,
+    "allocation_pct": 40,
+    "availability_pct": 60,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 24,
+    "capacity_hours": 24,
+    "utilization_pct": 40
+  },
+  {
+    "id": "EMP041",
+    "name": "Maria Joao",
+    "email": "maria.joao@accenture.com",
+    "designation": "Project Manager",
+    "department": "Management",
+    "location": "Lisbon",
+    "country": "Portugal",
+    "manager": "Priya Patel",
+    "primary_skills": [
+      "Agile",
+      "Scrum",
+      "PMP",
+      "JIRA",
+      "Risk Management"
+    ],
+    "secondary_skills": [
+      "Confluence",
+      "Power BI",
+      "MS Project",
+      "Slack",
+      "Kanban"
+    ],
+    "certifications": [
+      "PMP"
+    ],
+    "experience_years": 6,
+    "join_date": "2020-10-01",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Enterprise",
+      "Agile Transformation",
+      "Digital"
+    ],
+    "current_project": null,
+    "allocation_pct": 50,
+    "availability_pct": 50,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 20,
+    "capacity_hours": 20,
+    "utilization_pct": 50
+  },
+  {
+    "id": "EMP042",
+    "name": "Lars Hansen",
+    "email": "lars.hansen@accenture.com",
+    "designation": "Backend Engineer",
+    "department": "Engineering",
+    "location": "Warsaw",
+    "country": "Poland",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "Docker",
+      "Kubernetes"
+    ],
+    "secondary_skills": [
+      "Redis",
+      "Celery",
+      "AWS",
+      "SQLAlchemy",
+      "GraphQL"
+    ],
+    "certifications": [],
+    "experience_years": 5,
+    "join_date": "2021-09-15",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC004",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Backend",
+      "Cloud Native",
+      "Platform"
+    ],
+    "current_project": null,
+    "allocation_pct": 50,
+    "availability_pct": 50,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 20,
+    "capacity_hours": 20,
+    "utilization_pct": 50
+  },
+  {
+    "id": "EMP043",
+    "name": "Priya Nair",
+    "email": "priya.nair@accenture.com",
+    "designation": "Data Scientist",
+    "department": "Data",
+    "location": "Bangalore",
+    "country": "India",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "Machine Learning",
+      "SQL",
+      "Statistics",
+      "Power BI"
+    ],
+    "secondary_skills": [
+      "R",
+      "TensorFlow",
+      "Spark",
+      "Tableau",
+      "Jupyter"
+    ],
+    "certifications": [
+      "AWS Machine Learning Specialty"
+    ],
+    "experience_years": 4,
+    "join_date": "2022-06-15",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC001",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Analytics",
+      "AI/ML",
+      "Data Science"
+    ],
+    "current_project": null,
+    "allocation_pct": 40,
+    "availability_pct": 60,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 24,
+    "capacity_hours": 24,
+    "utilization_pct": 40
+  },
+  {
+    "id": "EMP044",
+    "name": "Tunde Adesanya",
+    "email": "tunde.adesanya@accenture.com",
+    "designation": "DevOps Engineer",
+    "department": "Engineering",
+    "location": "Lagos",
+    "country": "Nigeria",
+    "manager": "Ismail Januardi",
+    "primary_skills": [
+      "AWS",
+      "Docker",
+      "Kubernetes",
+      "CI-CD",
+      "Terraform"
+    ],
+    "secondary_skills": [
+      "Python",
+      "Ansible",
+      "Jenkins",
+      "Prometheus",
+      "Linux"
+    ],
+    "certifications": [
+      "AWS DevOps Engineer Professional"
+    ],
+    "experience_years": 4,
+    "join_date": "2022-11-01",
+    "status": "available",
+    "bench": false,
+    "billable": true,
+    "cost_center": "CC005",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Infrastructure",
+      "DevOps",
+      "Cloud Migration"
+    ],
+    "current_project": null,
+    "allocation_pct": 50,
+    "availability_pct": 50,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 20,
+    "capacity_hours": 20,
+    "utilization_pct": 50
+  },
+  {
+    "id": "EMP045",
+    "name": "Sophie Müller",
+    "email": "sophie.muller@accenture.com",
+    "designation": "Frontend Developer",
+    "department": "Engineering",
+    "location": "Berlin",
+    "country": "Germany",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "React",
+      "TypeScript",
+      "Vue.js",
+      "CSS",
+      "Figma"
+    ],
+    "secondary_skills": [
+      "Angular",
+      "Next.js",
+      "Jest",
+      "Storybook",
+      "Vite"
+    ],
+    "certifications": [],
+    "experience_years": 4,
+    "join_date": "2022-07-01",
+    "status": "bench",
+    "bench": true,
+    "billable": false,
+    "cost_center": "CC004",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Frontend",
+      "Design Systems",
+      "Consumer Apps"
+    ],
+    "current_project": null,
+    "allocation_pct": 25,
+    "availability_pct": 75,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 30,
+    "capacity_hours": 30,
+    "utilization_pct": 25
+  },
+  {
+    "id": "EMP046",
+    "name": "Reginald Okafor",
+    "email": "reginald.okafor@accenture.com",
+    "designation": "Full Stack Developer",
+    "department": "Engineering",
+    "location": "Accra",
+    "country": "Ghana",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "React",
+      "Node.js",
+      "PostgreSQL",
+      "Docker",
+      "TypeScript"
+    ],
+    "secondary_skills": [
+      "MongoDB",
+      "Redis",
+      "AWS",
+      "GraphQL",
+      "Express"
+    ],
+    "certifications": [],
+    "experience_years": 3,
+    "join_date": "2023-01-15",
+    "status": "bench",
+    "bench": true,
+    "billable": false,
+    "cost_center": "CC005",
+    "career_level": "L3",
+    "preferred_projects": [
+      "FullStack",
+      "Digital",
+      "Consumer Apps"
+    ],
+    "current_project": null,
+    "allocation_pct": 25,
+    "availability_pct": 75,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 30,
+    "capacity_hours": 30,
+    "utilization_pct": 25
+  },
+  {
+    "id": "EMP047",
+    "name": "Ana Luisa Ferreira",
+    "email": "ana.ferreira@accenture.com",
+    "designation": "QA Engineer",
+    "department": "Engineering",
+    "location": "São Paulo",
+    "country": "Brazil",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Selenium",
+      "Pytest",
+      "API Testing",
+      "JIRA",
+      "Performance Testing"
+    ],
+    "secondary_skills": [
+      "Python",
+      "JMeter",
+      "Postman",
+      "Cypress",
+      "TestRail"
+    ],
+    "certifications": [
+      "ISTQB Certified Tester"
+    ],
+    "experience_years": 3,
+    "join_date": "2023-04-01",
+    "status": "bench",
+    "bench": true,
+    "billable": false,
+    "cost_center": "CC002",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Quality",
+      "Test Automation",
+      "FinTech"
+    ],
+    "current_project": null,
+    "allocation_pct": 25,
+    "availability_pct": 75,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 30,
+    "capacity_hours": 30,
+    "utilization_pct": 25
+  },
+  {
+    "id": "EMP048",
+    "name": "Soren Nielsen",
+    "email": "soren.nielsen@accenture.com",
+    "designation": "Data Engineer",
+    "department": "Data",
+    "location": "Stockholm",
+    "country": "Sweden",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "Python",
+      "Spark",
+      "SQL",
+      "Airflow",
+      "dbt"
+    ],
+    "secondary_skills": [
+      "Databricks",
+      "Docker",
+      "Kafka",
+      "AWS",
+      "Delta Lake"
+    ],
+    "certifications": [],
+    "experience_years": 5,
+    "join_date": "2021-08-01",
+    "status": "bench",
+    "bench": true,
+    "billable": false,
+    "cost_center": "CC004",
+    "career_level": "L4",
+    "preferred_projects": [
+      "Data Platform",
+      "Analytics",
+      "Cloud Data"
+    ],
+    "current_project": null,
+    "allocation_pct": 25,
+    "availability_pct": 75,
+    "availability_date": "2026-07-30",
+    "weekly_capacity": 30,
+    "capacity_hours": 30,
+    "utilization_pct": 25
+  },
+  {
+    "id": "EMP049",
+    "name": "Grace Mensah",
+    "email": "grace.mensah@accenture.com",
+    "designation": "Frontend Developer",
+    "department": "Engineering",
+    "location": "Accra",
+    "country": "Ghana",
+    "manager": "Sarah Williams",
+    "primary_skills": [
+      "React",
+      "TypeScript",
+      "Figma",
+      "CSS",
+      "Next.js"
+    ],
+    "secondary_skills": [
+      "Vue.js",
+      "Tailwind",
+      "Storybook",
+      "HTML5",
+      "Jest"
+    ],
+    "certifications": [],
+    "experience_years": 3,
+    "join_date": "2023-06-01",
+    "status": "on_leave",
+    "bench": false,
+    "billable": false,
+    "cost_center": "CC005",
+    "career_level": "L3",
+    "preferred_projects": [
+      "Frontend",
+      "Design Systems",
+      "Consumer Apps"
+    ],
+    "current_project": null,
+    "allocation_pct": 10,
+    "availability_pct": 90,
+    "availability_date": "2026-09-01",
+    "weekly_capacity": 36,
+    "capacity_hours": 36,
+    "utilization_pct": 10
+  },
+  {
+    "id": "EMP050",
+    "name": "Hiroki Watanabe",
+    "email": "hiroki.watanabe@accenture.com",
+    "designation": "AI/ML Engineer",
+    "department": "Engineering",
+    "location": "Tokyo",
+    "country": "Japan",
+    "manager": "Carlos Jimenez",
+    "primary_skills": [
+      "Python",
+      "PyTorch",
+      "LangChain",
+      "ONNX",
+      "MLflow"
+    ],
+    "secondary_skills": [
+      "TensorFlow",
+      "FastAPI",
+      "Docker",
+      "Kubernetes",
+      "Ray"
+    ],
+    "certifications": [
+      "AWS Machine Learning Specialty"
+    ],
+    "experience_years": 6,
+    "join_date": "2021-02-01",
+    "status": "on_leave",
+    "bench": false,
+    "billable": false,
+    "cost_center": "CC003",
+    "career_level": "L4",
+    "preferred_projects": [
+      "AI/ML",
+      "Innovation",
+      "LLM"
+    ],
+    "current_project": null,
+    "allocation_pct": 10,
+    "availability_pct": 90,
+    "availability_date": "2026-09-01",
+    "weekly_capacity": 36,
+    "capacity_hours": 36,
+    "utilization_pct": 10
+  }
+]
