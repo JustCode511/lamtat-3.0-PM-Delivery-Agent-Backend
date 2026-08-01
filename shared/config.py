@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 
 from interfaces.conversation_store import ConversationStore
 from interfaces.llm import LLMClient
+from interfaces.memory_store import MemoryStore
 from interfaces.storage import SessionStore
 from interfaces.token_denylist import TokenDenylist
 from interfaces.user_store import UserStore
@@ -90,4 +91,15 @@ def get_conversation_store() -> ConversationStore:
     if APP_ENV == "aws":
         from adapters.conversation_dynamo import DynamoConversationStore
         return DynamoConversationStore()
+    raise ValueError(f"Unknown APP_ENV: {APP_ENV}")
+
+
+def get_memory_store() -> MemoryStore:
+    """Return the active long-term memory store (summaries + user facts) based on APP_ENV."""
+    if APP_ENV == "local":
+        from adapters.memory_json import JsonMemoryStore
+        return JsonMemoryStore()
+    if APP_ENV == "aws":
+        from adapters.memory_dynamo import DynamoMemoryStore
+        return DynamoMemoryStore()
     raise ValueError(f"Unknown APP_ENV: {APP_ENV}")

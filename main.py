@@ -51,6 +51,7 @@ from shared.config import (
     get_conversation_store,
     get_llm,
     get_mcp_client,
+    get_memory_store,
     get_session_store,
     get_token_denylist,
     get_user_store,
@@ -68,6 +69,7 @@ _mcp = get_mcp_client()
 _users = get_user_store()
 _denylist = get_token_denylist()
 _conversations = get_conversation_store()
+_memory_store = get_memory_store()
 
 # Singleton agents — built once and reused across all requests
 _agent = None
@@ -79,7 +81,7 @@ _memory: LongTermMemory | None = None
 async def lifespan(app: FastAPI):
     global _agent, _talent_agent, _memory
     await _mcp.connect()
-    _memory = LongTermMemory(_llm)
+    _memory = LongTermMemory(_llm, _memory_store)
     _agent = Agent(_llm, _store, _mcp, memory=_memory)
     _talent_agent = TalentAgent(_llm, _store, memory=_memory)
     yield

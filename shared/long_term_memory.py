@@ -12,11 +12,10 @@ Two complementary memory layers:
      is extracted and stored per user. Every new session starts with a
      "what I know about you" prefix, so the agent is never cold.
 
-Storage (local, mirrors the JSON session store):
-  data/session_summaries/<session_id>.json  →  {summary, covered_through}
-  data/user_memory/<user_id>.json           →  {facts: [...], updated_at}
+Storage is pluggable via MemoryStore (JSON files locally, DynamoDB on AWS),
+injected in the constructor — so long-term memory is durable on Lambda too.
 
-Both are best-effort: failures are logged but never propagate to the caller.
+Both layers are best-effort: failures are logged but never propagate to the caller.
 """
 from __future__ import annotations
 
@@ -24,9 +23,9 @@ import asyncio
 import json
 import logging
 import re
-from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
+
+from interfaces.memory_store import MemoryStore
 
 log = logging.getLogger(__name__)
 
@@ -56,12 +55,9 @@ Example: ["User manages project AABGFY26", "Prefers concise bullet-point summari
 class LongTermMemory:
     """Manages rolling session summaries and cross-session user facts."""
 
-    def __init__(self, llm: Any, base_dir: str = "data") -> None:
+    def __init__(self, llm: Any, store: MemoryStore) -> None:
         self._llm = llm
-        self._summaries_dir = Path(base_dir) / "session_summaries"
-        self._memory_dir = Path(base_dir) / "user_memory"
-        self._summaries_dir.mkdir(parents=True, exist_ok=True)
-        self._memory_dir.mkdir(parents=True, exist_ok=True)
+        self._store = store
 
     # ------------------------------------------------------------------
     # Context building — called BEFORE invoking the agent graph
@@ -145,33 +141,14 @@ class LongTermMemory:
     # Session summary — internal helpers
     # ------------------------------------------------------------------
 
-    def _summary_path(self, session_id: str) -> Path:
-        safe = "".join(c for c in session_id if c.isalnum() or c in ("-", "_"))
-        return self._summaries_dir / f"{safe}.json"
-
     def _load_summary(self, session_id: str) -> str | None:
-        p = self._summary_path(session_id)
-        if not p.exists():
-            return None
-        try:
-            return json.loads(p.read_text(encoding="utf-8")).get("summary") or None
-        except Exception:
-            return None
+        return self._store.get_summary(session_id).get("summary") or None
 
     def _load_summary_meta(self, session_id: str) -> dict[str, Any]:
-        p = self._summary_path(session_id)
-        if not p.exists():
-            return {"summary": None, "covered_through": 0}
-        try:
-            return json.loads(p.read_text(encoding="utf-8"))
-        except Exception:
-            return {"summary": None, "covered_through": 0}
+        return self._store.get_summary(session_id)
 
     def _save_summary(self, session_id: str, summary: str, covered_through: int) -> None:
-        self._summary_path(session_id).write_text(
-            json.dumps({"summary": summary, "covered_through": covered_through}, indent=2),
-            encoding="utf-8",
-        )
+        self._store.save_summary(session_id, summary, covered_through)
 
     async def _maybe_update_summary(
         self, session_id: str, full_history: list[dict[str, Any]]
@@ -213,27 +190,11 @@ class LongTermMemory:
     # User memory — internal helpers
     # ------------------------------------------------------------------
 
-    def _memory_path(self, user_id: str) -> Path:
-        safe = re.sub(r"[^A-Za-z0-9._-]", "_", user_id)
-        return self._memory_dir / f"{safe}.json"
-
     def _load_user_memory(self, user_id: str) -> list[str]:
-        p = self._memory_path(user_id)
-        if not p.exists():
-            return []
-        try:
-            return json.loads(p.read_text(encoding="utf-8")).get("facts", [])
-        except Exception:
-            return []
+        return self._store.get_user_facts(user_id)
 
     def _save_user_memory(self, user_id: str, facts: list[str]) -> None:
-        self._memory_path(user_id).write_text(
-            json.dumps(
-                {"facts": facts, "updated_at": datetime.now(timezone.utc).isoformat()},
-                indent=2,
-            ),
-            encoding="utf-8",
-        )
+        self._store.save_user_facts(user_id, facts)
 
     async def _maybe_update_user_memory(
         self, user_id: str | None, user_msg: str, assistant_reply: str
