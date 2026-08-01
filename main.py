@@ -43,6 +43,8 @@ from pydantic import BaseModel, Field
 from agent.core import Agent
 from talent.agent import TalentAgent
 from talent.routes import router as talent_router
+from finops.agent import FinOpsAgent
+from finops.routes import router as finops_router
 from shared.auth import create_jwt, decode_jwt, hash_password, verify_password
 from shared.aws_secrets import load_secrets_from_ssm
 from shared.long_term_memory import LongTermMemory
@@ -72,16 +74,18 @@ _conversations = get_conversation_store()
 # Singleton agents — built once and reused across all requests
 _agent = None
 _talent_agent: TalentAgent | None = None
+_finops_agent: FinOpsAgent | None = None
 _memory: LongTermMemory | None = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global _agent, _talent_agent, _memory
+    global _agent, _talent_agent, _finops_agent, _memory
     await _mcp.connect()
     _memory = LongTermMemory(_llm)
     _agent = Agent(_llm, _store, _mcp, memory=_memory)
     _talent_agent = TalentAgent(_llm, _store, memory=_memory)
+    _finops_agent = FinOpsAgent(_llm, _store, memory=_memory)
     yield
     await _mcp.close()
 
@@ -128,6 +132,9 @@ async def _observability_middleware(request: Request, call_next):
 
 # Include talent router (all /talent/* endpoints)
 app.include_router(talent_router)
+
+# Include finops router (all /finops/* endpoints)
+app.include_router(finops_router)
 
 # ---------------------------------------------------------------------------
 # JWT authentication — every protected endpoint depends on get_current_user,
@@ -707,6 +714,58 @@ async def talent_chat_stream(req: ChatRequest, user: str = Depends(get_current_u
         await _log_turn(user, req.session_id, req.message, reply, intent)
         await asyncio.to_thread(
             log_chat_event, module="talent", user=user, query=req.message,
+            response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id,
+            intent=intent, status="error" if error_msg else "ok", error=error_msg,
+        )
+
+        yield f"data: {json.dumps({'type': 'start', 'intent': intent})}\n\n"
+        chunk = 6
+        for i in range(0, len(reply), chunk):
+            yield f"data: {json.dumps({'type': 'delta', 'delta': reply[i : i + chunk]})}\n\n"
+        yield f"data: {json.dumps({'type': 'done', 'intent': intent, 'full': reply, 'reportable': False})}\n\n"
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "Connection": "keep-alive", "X-Accel-Buffering": "no"},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Cloud FinOps chat endpoints
+# ---------------------------------------------------------------------------
+
+@app.post("/finops/chat", response_model=ChatResponse)
+async def finops_chat(req: ChatRequest, user: str = Depends(get_current_user)) -> ChatResponse:
+    t0 = time.monotonic()
+    try:
+        reply, intent = await _finops_agent.chat(req.session_id, req.message, user_id=user)
+        await _log_turn(user, req.session_id, req.message, reply, intent)
+        await asyncio.to_thread(log_chat_event, module="finops", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, intent=intent)
+        return ChatResponse(reply=reply, session_id=req.session_id, ui_hint=intent, reportable=False)
+    except Exception as exc:
+        await asyncio.to_thread(log_chat_event, module="finops", user=user, query=req.message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id, status="error", error=str(exc))
+        raise
+
+
+@app.post("/finops/chat/stream")
+async def finops_chat_stream(req: ChatRequest, user: str = Depends(get_current_user)) -> StreamingResponse:
+    """Stream FinOps agent reply as SSE."""
+
+    async def generate():
+        t0 = time.monotonic()
+        error_msg: str | None = None
+        try:
+            reply, intent = await _finops_agent.chat(req.session_id, req.message, user_id=user)
+        except Exception as exc:
+            reply, intent = f"FinOps Agent error: {exc}", "finops"
+            error_msg = str(exc)
+
+        await _log_turn(user, req.session_id, req.message, reply, intent)
+        await asyncio.to_thread(
+            log_chat_event, module="finops", user=user, query=req.message,
             response_ms=(time.monotonic()-t0)*1000, session_id=req.session_id,
             intent=intent, status="error" if error_msg else "ok", error=error_msg,
         )
