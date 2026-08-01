@@ -80,6 +80,18 @@ GEMINI_API_KEY=your-real-key
 Leave Jira/Slack values as-is for now — the agent still runs; those tools just
 return "not configured" until you add real credentials.
 
+### 4. Create your first login user
+`data/users.json` is gitignored (it contains credential hashes). Run the seed
+script once to create a default `admin` user:
+```
+python scripts/create_user.py
+# → username: admin  password: admin123
+```
+Or create a custom user:
+```
+python scripts/create_user.py yourname yourpassword
+```
+
 ---
 
 ## Run
