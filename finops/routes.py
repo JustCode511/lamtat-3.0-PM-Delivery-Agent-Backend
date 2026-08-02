@@ -14,7 +14,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
 
-from finops.models import SetBudgetRequest, SlackDigestRequest
+from finops.models import LiveDataSetting, SetBudgetRequest, SetLiveDataRequest, SlackDigestRequest
 from finops.services import FinOpsService
 
 log = logging.getLogger(__name__)
@@ -34,6 +34,25 @@ async def verify_api_key(authorization: str | None = Header(default=None)) -> st
 # Single shared service instance (stateless business logic; each call hits
 # live AWS APIs, so there's no in-process state to protect)
 _svc = FinOpsService()
+
+
+# ---------------------------------------------------------------------------
+# Settings — live AWS data vs. mock data
+#
+# Cost Explorer bills $0.01 per API request regardless of whether it
+# returns data, and the dashboard fires 6-10 of those per load. Defaults
+# to mock (finops/repository.py); flip live_data_enabled to hit real AWS.
+# ---------------------------------------------------------------------------
+
+@router.get("/settings/live-data", dependencies=[Depends(verify_api_key)])
+async def finops_get_live_data_setting() -> dict[str, Any]:
+    return LiveDataSetting(live_data_enabled=_svc.is_live()).model_dump()
+
+
+@router.post("/settings/live-data", dependencies=[Depends(verify_api_key)])
+async def finops_set_live_data_setting(req: SetLiveDataRequest) -> dict[str, Any]:
+    enabled = await asyncio.to_thread(_svc.set_live_data_enabled, req.live_data_enabled)
+    return LiveDataSetting(live_data_enabled=enabled).model_dump()
 
 
 # ---------------------------------------------------------------------------

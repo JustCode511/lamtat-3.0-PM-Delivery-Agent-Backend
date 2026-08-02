@@ -1,9 +1,12 @@
 """
 Pydantic models for the Cloud FinOps module.
 
-All cost data is read live from AWS (Cost Explorer, Compute Optimizer, EC2,
-Budgets) — see finops/aws_client.py. These models are the shapes the service
-layer normalises that live data into before handing it to routes/agent.
+Cost data comes from either live AWS (Cost Explorer, Compute Optimizer,
+EC2, Budgets — see finops/aws_client.py) or fabricated mock data
+(finops/mock_data.py), depending on the live_data_enabled setting. These
+models are the shapes the service layer normalises that data into before
+handing it to routes/agent; CostSummary.data_source says which one produced
+a given response.
 """
 from __future__ import annotations
 
@@ -87,6 +90,14 @@ class BudgetStatus(BaseModel):
 
 class SetBudgetRequest(BaseModel):
     target_monthly_budget: float = Field(..., ge=0)
+
+
+class LiveDataSetting(BaseModel):
+    live_data_enabled: bool
+
+
+class SetLiveDataRequest(BaseModel):
+    live_data_enabled: bool
 
 
 class DashboardStats(BaseModel):

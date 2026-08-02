@@ -1,19 +1,21 @@
 """
 Service layer for the Cloud FinOps module.
 
-Pulls live data from finops/aws_client.py and turns it into the
-dashboard/anomaly/rightsizing/budget shapes defined in finops/models.py.
-All numbers here are derived from real AWS API responses — nothing is
-fabricated. When AWS can't supply a signal (no anomaly monitors, Compute
+Pulls data from finops/aws_client.py (real AWS) or finops/mock_data.py
+(fabricated, zero-cost) depending on the persisted live_data_enabled
+setting — see _source() below. AWS Cost Explorer bills per API request
+regardless of whether it returns data, so the setting defaults to mock
+(finops/repository.py) and live is opt-in via POST /finops/settings.
+When live and AWS can't supply a signal (no anomaly monitors, Compute
 Optimizer not enrolled, insufficient forecast history) the result says so
 explicitly instead of inventing a number.
 
 Each "get_*" method is independently usable (used by the per-tab GET
 endpoints) and fetches its own raw data sequentially. get_dashboard(), which
-needs nearly everything at once, instead fires all the independent boto3
-calls concurrently via a thread pool — Cost Explorer/Compute Optimizer/EC2
-calls are all blocking I/O with no shared state, so this cuts total load
-time from the sum of ~10 round-trips to roughly the slowest one.
+needs nearly everything at once, instead fires all the independent source
+calls concurrently via a thread pool — in live mode these are blocking I/O
+with no shared state, so this cuts total load time from the sum of ~10
+round-trips to roughly the slowest one.
 """
 from __future__ import annotations
 
@@ -24,9 +26,10 @@ import uuid
 from calendar import monthrange
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
+from types import ModuleType
 from typing import Any, Optional
 
-from finops import aws_client
+from finops import aws_client, mock_data
 from finops.models import (
     Anomaly,
     AnomalyResult,
@@ -59,6 +62,16 @@ def _clamp_noise(amount: float) -> float:
 class FinOpsService:
     def __init__(self) -> None:
         self.settings_repo = FinOpsSettingsRepository()
+
+    def _source(self) -> ModuleType:
+        return aws_client if self.settings_repo.get_live_data_enabled() else mock_data
+
+    def is_live(self) -> bool:
+        return self.settings_repo.get_live_data_enabled()
+
+    def set_live_data_enabled(self, enabled: bool) -> bool:
+        self.settings_repo.set_live_data_enabled(enabled)
+        return enabled
 
     # ------------------------------------------------------------------
     # Cost summary
@@ -110,13 +123,15 @@ class FinOpsService:
             by_service=by_service,
             active_services=sorted(active_services) if active_services is not None else [s.service for s in by_service],
             daily_trend=[DailyCostPoint(date=p["date"], amount=round(p["amount"], 4)) for p in daily],
+            data_source="aws_cost_explorer" if self.is_live() else "mock",
         )
 
     def get_cost_summary(self, days: int = 30) -> CostSummary:
-        account_id = aws_client.get_account_id()
-        daily_raw = aws_client.get_daily_cost(days)
-        by_service_raw = aws_client.get_cost_by_service(days)
-        active_services = aws_client.get_active_services(days)
+        source = self._source()
+        account_id = source.get_account_id()
+        daily_raw = source.get_daily_cost(days)
+        by_service_raw = source.get_cost_by_service(days)
+        active_services = source.get_active_services(days)
         return self._build_cost_summary(account_id, daily_raw, by_service_raw, active_services)
 
     # ------------------------------------------------------------------
@@ -187,8 +202,9 @@ class FinOpsService:
 
     def get_anomalies(self, cost_summary: Optional[CostSummary] = None) -> AnomalyResult:
         cost_summary = cost_summary or self.get_cost_summary()
-        monitors_configured = aws_client.has_anomaly_monitors()
-        native_raw = aws_client.get_native_anomalies()
+        source = self._source()
+        monitors_configured = source.has_anomaly_monitors()
+        native_raw = source.get_native_anomalies()
         return self._build_anomalies(cost_summary, native_raw, monitors_configured)
 
     # ------------------------------------------------------------------
@@ -266,9 +282,10 @@ class FinOpsService:
         )
 
     def get_rightsizing(self) -> RightsizingResult:
-        co = aws_client.get_compute_optimizer_recommendations()
-        instances = aws_client.get_ec2_instances()
-        volumes = aws_client.get_unattached_ebs_volumes()
+        source = self._source()
+        co = source.get_compute_optimizer_recommendations()
+        instances = source.get_ec2_instances()
+        volumes = source.get_unattached_ebs_volumes()
         return self._build_rightsizing(co, instances, volumes)
 
     # ------------------------------------------------------------------
@@ -319,9 +336,10 @@ class FinOpsService:
 
     def get_budget_status(self, cost_summary: Optional[CostSummary] = None) -> BudgetStatus:
         cost_summary = cost_summary or self.get_cost_summary()
+        source = self._source()
         days_remaining = monthrange(date.today().year, date.today().month)[1] - date.today().day
-        forecast = aws_client.get_cost_forecast(days_ahead=max(days_remaining, 1))
-        aws_budgets = aws_client.get_aws_budgets(cost_summary.account_id)
+        forecast = source.get_cost_forecast(days_ahead=max(days_remaining, 1))
+        aws_budgets = source.get_aws_budgets(cost_summary.account_id)
         return self._build_budget_status(cost_summary, forecast, aws_budgets)
 
     def set_target_budget(self, amount: float) -> BudgetStatus:
@@ -337,18 +355,19 @@ class FinOpsService:
     def get_dashboard(self, days: int = 30) -> DashboardStats:
         today = date.today()
         days_remaining = monthrange(today.year, today.month)[1] - today.day
+        source = self._source()
 
         with ThreadPoolExecutor(max_workers=10) as pool:
-            f_account = pool.submit(aws_client.get_account_id)
-            f_daily = pool.submit(aws_client.get_daily_cost, days)
-            f_by_service = pool.submit(aws_client.get_cost_by_service, days)
-            f_active_services = pool.submit(aws_client.get_active_services, days)
-            f_forecast = pool.submit(aws_client.get_cost_forecast, max(days_remaining, 1))
-            f_monitors = pool.submit(aws_client.has_anomaly_monitors)
-            f_native_anom = pool.submit(aws_client.get_native_anomalies, days)
-            f_co = pool.submit(aws_client.get_compute_optimizer_recommendations)
-            f_instances = pool.submit(aws_client.get_ec2_instances)
-            f_volumes = pool.submit(aws_client.get_unattached_ebs_volumes)
+            f_account = pool.submit(source.get_account_id)
+            f_daily = pool.submit(source.get_daily_cost, days)
+            f_by_service = pool.submit(source.get_cost_by_service, days)
+            f_active_services = pool.submit(source.get_active_services, days)
+            f_forecast = pool.submit(source.get_cost_forecast, max(days_remaining, 1))
+            f_monitors = pool.submit(source.has_anomaly_monitors)
+            f_native_anom = pool.submit(source.get_native_anomalies, days)
+            f_co = pool.submit(source.get_compute_optimizer_recommendations)
+            f_instances = pool.submit(source.get_ec2_instances)
+            f_volumes = pool.submit(source.get_unattached_ebs_volumes)
 
             account_id = f_account.result()
             daily_raw = f_daily.result()
@@ -363,7 +382,7 @@ class FinOpsService:
 
             # Needs account_id, so it's fired once that's ready, in a second
             # (still concurrent) wave alongside nothing else outstanding.
-            aws_budgets = pool.submit(aws_client.get_aws_budgets, account_id).result()
+            aws_budgets = pool.submit(source.get_aws_budgets, account_id).result()
 
         cost_summary = self._build_cost_summary(account_id, daily_raw, by_service_raw, active_services)
         anomalies = self._build_anomalies(cost_summary, native_anom_raw, monitors_configured)
