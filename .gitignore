@@ -17,6 +17,7 @@ data/user_memory/
 data/conversations.json
 data/users.json
 data/revoked_tokens.json
+data/jobs.json
 # data/employees.json, projects.json, allocations.json, skills.json are committed as seed data
 
 # OS files

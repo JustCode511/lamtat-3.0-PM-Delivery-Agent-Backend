@@ -30,13 +30,20 @@ STEP 2 — CLASSIFY intent (pick exactly one):
                 status, risks, milestones, team workload, ticket search, project comparison,
                 deliverables, "who is assigned to what", "show me tickets", "compare X vs Y",
                 "flag risks", "generate a summary", "what's at risk", "status report", etc.
-                NOTE: generating a report or summary for the user to READ is always "query" —
-                even if the user says "flag", "generate", "show me", "give me a report".
+                THIS ALSO INCLUDES reports the user wants to "send to leadership" / "send to
+                my leadership" / "leadership summary" — you GENERATE the report only; a
+                separate UI approval button (Approve & Send) performs the actual send, so it
+                stays "query".
+                NOTE: generating a report or summary for the user to READ, or to review
+                before approving a send, is always "query" — even if the user says "flag",
+                "generate", "show me", "give me a report", or "send to leadership".
 - create_issue: user wants to CREATE a new Jira ticket, bug, story, task, or epic
 - send_slack_notification: user EXPLICITLY says "send to Slack", "post to Slack",
-                "notify the team on Slack", or "message the channel". Generating a report
-                for the user to read in chat is NOT this intent. The user must explicitly
-                request a Slack action.
+                "notify the team on Slack", or "message the channel" as a direct ad-hoc team
+                notification. Generating a report for the user to read is NOT this intent.
+                "Send to leadership" / "send this report to my leadership" is NOT this — that
+                is "query" (the report is generated for review, then the human approves the
+                send via the UI). NEVER auto-send a leadership report.
 - generate_ppt: user explicitly wants a PowerPoint / PPT / slide deck file
 - out_of_scope: request is outside PM scope (see Step 1)
 - default    : greetings, "what can you do?", or genuinely unclear requests
@@ -74,6 +81,36 @@ def make_supervisor_node(llm: LLMClient):
         # Normalise: null strings → None
         if project_key in ("null", "none", ""):
             project_key = None
+
+        # ── Deterministic overrides ──────────────────────────────────────────
+        # The LLM classifier is occasionally inconsistent on the SAME request
+        # (e.g. a PPT ask routed to 'query', or a leadership report mis-routed),
+        # which makes the UI's download/approve buttons appear only sometimes.
+        # Hard-code the strongest, unambiguous signals so routing — and the
+        # buttons that depend on it — is reliable every single time.
+        msg_l = state["user_message"].lower()
+        is_ppt = any(w in msg_l for w in (
+            "powerpoint", "power point", "ppt", ".pptx", "slide deck", "slides", "deck", "presentation",
+        ))
+        # "summ" catches summary/summarise AND the common typo "summay"; the rest
+        # are report-ish synonyms. Gated by a leadership audience below, so this
+        # never hijacks ticket-creation ("assign to leadership") etc.
+        is_report = any(w in msg_l for w in (
+            "report", "summ", "overview", "briefing", "brief", "analysis", "portfolio",
+        ))
+        wants_leadership = any(w in msg_l for w in (
+            "leadership", "stakeholder", "executive", "the board", "steering", "senior management", "leaders",
+        ))
+        if is_ppt:
+            intent = "generate_ppt"
+        elif is_report and wants_leadership and "slack" not in msg_l:
+            # A leadership report is the read/analyse path; the human approves the
+            # actual send via the UI ("Approve & Send"), so it stays "query".
+            intent = "query"
+
+        # Backstop: any "send to leadership" that still slipped to Slack → query.
+        if intent == "send_slack_notification" and "leadership" in msg_l:
+            intent = "query"
         log.info("[SUPERVISOR] → intent=%r  project_key=%r", intent, project_key)
         return {**state, "intent": intent, "project_key": project_key}
 

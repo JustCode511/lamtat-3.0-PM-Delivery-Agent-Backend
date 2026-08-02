@@ -51,8 +51,10 @@ from shared.long_term_memory import LongTermMemory
 from shared.observability import log_chat_event, log_request
 from shared.config import (
     get_conversation_store,
+    get_job_store,
     get_llm,
     get_mcp_client,
+    get_memory_store,
     get_session_store,
     get_token_denylist,
     get_user_store,
@@ -70,6 +72,17 @@ _mcp = get_mcp_client()
 _users = get_user_store()
 _denylist = get_token_denylist()
 _conversations = get_conversation_store()
+_memory_store = get_memory_store()
+_jobs = get_job_store()
+
+# Lazily-created boto3 Lambda client, used to fire the background job invocation.
+_lambda_client = None
+def _get_lambda_client():
+    global _lambda_client
+    if _lambda_client is None:
+        import boto3
+        _lambda_client = boto3.client("lambda")
+    return _lambda_client
 
 # Singleton agents — built once and reused across all requests
 _agent = None
@@ -78,23 +91,62 @@ _finops_agent: FinOpsAgent | None = None
 _memory: LongTermMemory | None = None
 
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
+async def _ensure_agent() -> None:
+    """Build the singleton agents once (idempotent). Used by the HTTP lifespan
+    AND by the background job worker (which doesn't run the ASGI lifespan)."""
     global _agent, _talent_agent, _finops_agent, _memory
+    if _agent is not None:
+        return
     await _mcp.connect()
-    _memory = LongTermMemory(_llm)
+    _memory = LongTermMemory(_llm, _memory_store)
     _agent = Agent(_llm, _store, _mcp, memory=_memory)
     _talent_agent = TalentAgent(_llm, _store, memory=_memory)
     _finops_agent = FinOpsAgent(_llm, _store, memory=_memory)
+
+
+async def _process_job(job: dict) -> None:
+    """Run one chat turn to completion and persist the result to the job store.
+    Invoked in a SEPARATE Lambda invocation (background), so it isn't bound by
+    the API Gateway 30s request cap — the client just polls for the result."""
+    await _ensure_agent()
+    job_id = job.get("job_id")
+    session_id = job.get("session_id")
+    message = job.get("message")
+    user = job.get("user")
+    t0 = time.monotonic()
+    try:
+        reply, intent = await _agent.chat(session_id, message, user_id=user)
+        reportable = _is_reportable(message) and intent == "query"
+        await _log_turn(user, session_id, message, reply, intent)
+        await asyncio.to_thread(_jobs.complete, job_id, reply, intent, reportable)
+        await asyncio.to_thread(log_chat_event, module="pm", user=user, query=message,
+                                response_ms=(time.monotonic()-t0)*1000, session_id=session_id, intent=intent)
+    except Exception as exc:  # noqa: BLE001
+        log.exception("[JOB] %s failed", job_id)
+        await asyncio.to_thread(_jobs.fail, job_id, str(exc))
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await _ensure_agent()
     yield
     await _mcp.close()
 
 
 def _is_reportable(user_message: str) -> bool:
-    """True only when the user explicitly requests a formal report or risk flagging.
-    General queries that happen to mention risks should NOT trigger approve/send buttons."""
+    """True when the user wants to route the response to a leadership audience,
+    so we offer the 'Approve & Send to Leadership' button.
+
+    Keyed on the AUDIENCE (leadership / stakeholders / executives / board), NOT on
+    fragile 'report'/'summary' spelling — so a typo like 'summay' or phrasing like
+    'portfolio overview for leadership' still triggers it. This is deterministic
+    (no LLM). Callers gate on intent == 'query' so only read/analyse answers (not
+    PPT or ticket creation) get the buttons."""
     msg = user_message.lower()
-    return "report" in msg and "send" in msg
+    return any(w in msg for w in (
+        "leadership", "stakeholder", "executive", "the board",
+        "steering committee", "senior management", "leaders",
+    ))
 
 
 app = FastAPI(title="AI Delivery Intelligence", lifespan=lifespan)
@@ -204,6 +256,23 @@ class ChatResponse(BaseModel):
     session_id: str
     ui_hint: str | None = None
     reportable: bool = False
+
+
+class AsyncChatRequest(BaseModel):
+    session_id: str = Field(default_factory=lambda: f"session-{uuid.uuid4().hex[:8]}")
+    message: str = Field(..., min_length=1, max_length=MAX_MESSAGE_LEN)
+    # Client-generated so the frontend can start polling immediately.
+    job_id: str = Field(default_factory=lambda: uuid.uuid4().hex)
+
+
+class JobStatusResponse(BaseModel):
+    job_id: str
+    status: str  # pending | done | error
+    reply: str | None = None
+    ui_hint: str | None = None
+    reportable: bool = False
+    error: str | None = None
+    session_id: str | None = None
 
 
 class AuthRequest(BaseModel):
@@ -611,6 +680,63 @@ async def pm_chat(req: ChatRequest, user: str = Depends(get_current_user)) -> Ch
 
 
 # ---------------------------------------------------------------------------
+# Async chat (poll-for-result) — beats API Gateway's hard 30s client cap.
+#
+# The HTTP API returns 504 to the *client* at 30s, but this Lambda invocation
+# keeps running to completion (~35s for a heavy report). So we run the agent
+# normally and persist the finished reply to the job store; the frontend polls
+# /pm/chat/result/{job_id} until status flips to done/error. A slow report can
+# therefore never "fail" the UI — it just arrives a few seconds later.
+# ---------------------------------------------------------------------------
+
+@app.post("/pm/chat/async", response_model=JobStatusResponse)
+async def pm_chat_async(req: AsyncChatRequest, user: str = Depends(get_current_user)) -> JobStatusResponse:
+    """Returns IMMEDIATELY with a pending job, then does the real work in a
+    background Lambda invocation — so this request never holds open for 30s and
+    never 504s. The client polls /pm/chat/result/{job_id} for the answer."""
+    await asyncio.to_thread(_jobs.create, req.job_id, user, req.session_id, req.message)
+    payload = {"__job__": {
+        "job_id": req.job_id, "session_id": req.session_id,
+        "message": req.message, "user": user,
+    }}
+    fn = os.getenv("AWS_LAMBDA_FUNCTION_NAME")
+    if fn:
+        # AWS: fire a separate async (Event) invocation of THIS function; it runs
+        # the agent to completion (up to the 5-min timeout) with no request cap.
+        await asyncio.to_thread(
+            lambda: _get_lambda_client().invoke(
+                FunctionName=fn,
+                InvocationType="Event",
+                Payload=json.dumps(payload).encode("utf-8"),
+            )
+        )
+    else:
+        # Local dev: no Lambda to self-invoke — run it as a background task.
+        asyncio.create_task(_process_job(payload["__job__"]))
+    return JobStatusResponse(job_id=req.job_id, status="pending", session_id=req.session_id)
+
+
+@app.get("/pm/chat/result/{job_id}", response_model=JobStatusResponse)
+async def pm_chat_result(job_id: str, user: str = Depends(get_current_user)) -> JobStatusResponse:
+    """Fast poll endpoint (a single DynamoDB read — always well under 30s)."""
+    job = await asyncio.to_thread(_jobs.get, job_id)
+    if job is None:
+        # Not created yet (poll raced the POST) or expired — treat as pending.
+        return JobStatusResponse(job_id=job_id, status="pending")
+    if job.get("user_id") != user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Job not found.")
+    return JobStatusResponse(
+        job_id=job_id,
+        status=job.get("status", "pending"),
+        reply=job.get("reply"),
+        ui_hint=job.get("intent"),
+        reportable=bool(job.get("reportable", False)),
+        error=job.get("error"),
+        session_id=job.get("session_id"),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Conversation history — powers the Claude-style sidebar. Scoped to the
 # authenticated user; you can only list and replay your own conversations.
 # ---------------------------------------------------------------------------
@@ -630,6 +756,16 @@ async def get_conversation(session_id: str, user: str = Depends(get_current_user
         session_id=session_id,
         messages=[ConversationMessage(**m) for m in msgs],
     )
+
+
+@app.delete("/pm/conversations/{session_id}")
+async def delete_conversation(session_id: str, user: str = Depends(get_current_user)) -> dict:
+    """Permanently delete one of the user's conversations from the store.
+    Ownership-scoped — you can only delete your own chats."""
+    deleted = await asyncio.to_thread(_conversations.delete, user, session_id)
+    if not deleted:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Conversation not found.")
+    return {"deleted": True, "session_id": session_id}
 
 
 # ---------------------------------------------------------------------------
@@ -880,8 +1016,40 @@ async def send_to_leadership(req: LeadershipRequest) -> dict:
 # Lambda handler — Mangum wraps the FastAPI ASGI app.
 # InlineMCPClient.connect/close are no-ops so lifespan works fine on Lambda.
 # ---------------------------------------------------------------------------
+def _run_job_blocking(job: dict) -> None:
+    """Run a background job on its OWN event loop, inside a dedicated thread.
+
+    Critical: we must NOT touch the main thread's event loop. asyncio.run() (or
+    closing the main loop) sets the main thread's current loop to None, which then
+    breaks Mangum's asyncio.get_event_loop() on the NEXT HTTP invocation in the
+    same warm Lambda environment. Running in a worker thread keeps all loop
+    lifecycle (create/close) thread-local, leaving the HTTP path untouched.
+    """
+    import threading
+
+    def _runner():
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            loop.run_until_complete(_process_job(job))
+        finally:
+            loop.close()
+
+    t = threading.Thread(target=_runner, name="job-worker")
+    t.start()
+    t.join()
+
+
 try:
     from mangum import Mangum
-    handler = Mangum(app, lifespan="auto")
+    _mangum = Mangum(app, lifespan="auto")
+
+    def handler(event, context):
+        # Background job invocations (fired by POST /pm/chat/async) carry a
+        # "__job__" key and are NOT HTTP events — run the agent worker for them.
+        if isinstance(event, dict) and "__job__" in event:
+            _run_job_blocking(event["__job__"])
+            return {"ok": True}
+        return _mangum(event, context)
 except ImportError:
     handler = None  # mangum not installed locally; uvicorn is used instead

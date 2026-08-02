@@ -73,3 +73,12 @@ class JsonConversationStore(ConversationStore):
         if not convo:
             return None
         return convo.get("messages", [])
+
+    def delete(self, user_id, session_id) -> bool:
+        data = self._load()
+        convos = data.get(user_id, {})
+        if session_id not in convos:
+            return False
+        del convos[session_id]
+        self._save(data)
+        return True
