@@ -16,6 +16,7 @@ import os
 from dotenv import load_dotenv
 
 from interfaces.conversation_store import ConversationStore
+from interfaces.job_store import JobStore
 from interfaces.llm import LLMClient
 from interfaces.memory_store import MemoryStore
 from interfaces.storage import SessionStore
@@ -102,4 +103,15 @@ def get_memory_store() -> MemoryStore:
     if APP_ENV == "aws":
         from adapters.memory_dynamo import DynamoMemoryStore
         return DynamoMemoryStore()
+    raise ValueError(f"Unknown APP_ENV: {APP_ENV}")
+
+
+def get_job_store() -> JobStore:
+    """Return the active async-chat job store (poll-for-result) based on APP_ENV."""
+    if APP_ENV == "local":
+        from adapters.job_json import JsonJobStore
+        return JsonJobStore()
+    if APP_ENV == "aws":
+        from adapters.job_dynamo import DynamoJobStore
+        return DynamoJobStore()
     raise ValueError(f"Unknown APP_ENV: {APP_ENV}")

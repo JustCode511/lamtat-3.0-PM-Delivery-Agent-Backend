@@ -8,6 +8,7 @@ On Lambda, credentials come from the IAM role automatically (no key needed).
 from __future__ import annotations
 import json
 import os
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 import boto3
@@ -128,7 +129,10 @@ class BedrockClient(LLMClient):
                 "modelId": self.model_id,
                 "system": [{"text": system_prompt}],
                 "messages": messages,
-                "inferenceConfig": {"maxTokens": 2048, "temperature": 0.2},
+                # 8192 so a detailed multi-/all-project report is never truncated
+                # mid-sentence. The model only emits what it needs, so single-project
+                # reports stay short; this is purely a ceiling for the big ones.
+                "inferenceConfig": {"maxTokens": 8192, "temperature": 0.2},
             }
             if bedrock_tools:
                 kwargs["toolConfig"] = {"tools": bedrock_tools}
@@ -143,17 +147,28 @@ class BedrockClient(LLMClient):
             if not tool_use_blocks:
                 return "".join(text_blocks) or "[No answer produced.]"
 
-            # Execute each tool call and collect results
-            tool_results = []
-            for block in tool_use_blocks:
-                tu = block["toolUse"]
-                result = tool_executor(tu["name"], tu["input"])
-                tool_results.append({
+            # Execute the tool calls. When Sonnet batches several tools in one turn
+            # (e.g. get_project_status + flag_risks), run them CONCURRENTLY instead of
+            # one-after-another — each tool_executor call is an independent Jira round-trip,
+            # so parallelism turns their latency from a sum into a max. Order is preserved
+            # to keep toolUseId ↔ toolResult pairing correct.
+            tus = [b["toolUse"] for b in tool_use_blocks]
+            if len(tus) == 1:
+                results = [tool_executor(tus[0]["name"], tus[0]["input"])]
+            else:
+                with ThreadPoolExecutor(max_workers=len(tus)) as pool:
+                    results = list(
+                        pool.map(lambda tu: tool_executor(tu["name"], tu["input"]), tus)
+                    )
+            tool_results = [
+                {
                     "toolResult": {
                         "toolUseId": tu["toolUseId"],
                         "content": [{"text": str(result)}],
                     }
-                })
+                }
+                for tu, result in zip(tus, results)
+            ]
             messages.append({"role": "user", "content": tool_results})
 
         return "[Max tool rounds reached without final answer.]"

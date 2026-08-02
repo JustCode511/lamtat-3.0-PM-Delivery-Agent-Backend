@@ -40,3 +40,10 @@ class ConversationStore(ABC):
         """Return a conversation's messages, or None if it doesn't exist or
         isn't owned by this user. Each message: {role, content, ui_hint, created_at}."""
         raise NotImplementedError
+
+    @abstractmethod
+    def delete(self, user_id: str, session_id: str) -> bool:
+        """Permanently delete a conversation. Returns True if it existed and was
+        owned by this user (and is now gone), False otherwise. Ownership-scoped
+        so a user can only ever delete their own chats."""
+        raise NotImplementedError

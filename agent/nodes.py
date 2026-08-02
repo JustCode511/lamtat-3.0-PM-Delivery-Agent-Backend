@@ -145,6 +145,10 @@ def make_nodes(llm: LLMClient, mcp: Any) -> dict[str, Any]:
             f"Slides included: Title, Executive Summary, per-project Status & Risk slides, Next Steps."
         )
         result = await llm_generate(llm, GENERATE_PPT_PROMPT, context)
+        # Guarantee the link is present & parseable regardless of LLM phrasing —
+        # append a clean markdown download link if the model didn't echo the URL.
+        if download_url not in result:
+            result = f"{result.rstrip()}\n\n[Download PowerPoint]({download_url})"
         return {**state, "result": result}
 
     # ------------------------------------------------------------------ #

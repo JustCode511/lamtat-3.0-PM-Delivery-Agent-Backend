@@ -69,3 +69,16 @@ class DynamoConversationStore(ConversationStore):
         if not item or item.get("user_id") != user_id:
             return None
         return item.get("messages", [])
+
+    def delete(self, user_id, session_id) -> bool:
+        # Ownership-scoped delete: only removes the item if it belongs to this
+        # user (conditional expression guards against deleting someone else's).
+        try:
+            self.table.delete_item(
+                Key={"session_id": session_id},
+                ConditionExpression="user_id = :u",
+                ExpressionAttributeValues={":u": user_id},
+            )
+            return True
+        except self.table.meta.client.exceptions.ConditionalCheckFailedException:
+            return False
