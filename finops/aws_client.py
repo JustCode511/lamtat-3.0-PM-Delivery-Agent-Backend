@@ -61,8 +61,14 @@ def get_account_id() -> Optional[str]:
         return None
 
 
+# Show real consumption (usage), not net-of-credits. On a credit-covered account
+# the credit line items exactly offset usage to ~$0, which reads as "empty" — this
+# filter reports the gross usage the account actually consumed.
+_USAGE_ONLY = {"Dimensions": {"Key": "RECORD_TYPE", "Values": ["Usage"]}}
+
+
 def get_daily_cost(days: int = 30) -> list[dict[str, Any]]:
-    """Daily UnblendedCost totals for the trailing `days` days."""
+    """Daily UnblendedCost (gross usage) totals for the trailing `days` days."""
     end = date.today()
     start = end - timedelta(days=days)
     try:
@@ -70,6 +76,7 @@ def get_daily_cost(days: int = 30) -> list[dict[str, Any]]:
             TimePeriod={"Start": start.isoformat(), "End": end.isoformat()},
             Granularity="DAILY",
             Metrics=["UnblendedCost"],
+            Filter=_USAGE_ONLY,
         )
     except (ClientError, BotoCoreError) as exc:
         log.warning("[FINOPS] ce.get_cost_and_usage(daily) failed: %s", exc)
@@ -92,6 +99,7 @@ def get_cost_by_service(days: int = 30) -> list[dict[str, Any]]:
             Granularity="MONTHLY",
             Metrics=["UnblendedCost"],
             GroupBy=[{"Type": "DIMENSION", "Key": "SERVICE"}],
+            Filter=_USAGE_ONLY,
         )
     except (ClientError, BotoCoreError) as exc:
         log.warning("[FINOPS] ce.get_cost_and_usage(by service) failed: %s", exc)
