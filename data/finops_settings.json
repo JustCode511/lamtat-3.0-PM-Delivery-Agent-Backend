@@ -1,3 +1,4 @@
 {
-  "target_monthly_budget": 100.0
+  "target_monthly_budget": 100.0,
+  "live_data_enabled": false
 }
