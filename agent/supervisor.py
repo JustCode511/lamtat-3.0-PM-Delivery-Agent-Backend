@@ -111,6 +111,17 @@ def make_supervisor_node(llm: LLMClient):
         # Backstop: any "send to leadership" that still slipped to Slack → query.
         if intent == "send_slack_notification" and "leadership" in msg_l:
             intent = "query"
+
+        # Deterministic portfolio scope — "all/every project(s)", "portfolio",
+        # "across projects" always means the WHOLE portfolio (__ALL__). Without
+        # this, a PPT/report for "all projects" whose __ALL__ the LLM missed would
+        # fall through to clarify_project ("which project?") instead of running.
+        if any(p in msg_l for p in (
+            "all project", "all the project", "all our project", "every project",
+            "across project", "across all project", "portfolio", "all four project",
+        )):
+            project_key = "__ALL__"
+
         log.info("[SUPERVISOR] → intent=%r  project_key=%r", intent, project_key)
         return {**state, "intent": intent, "project_key": project_key}
 
