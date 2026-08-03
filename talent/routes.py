@@ -14,6 +14,7 @@ import logging
 from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, status
+from fastapi.responses import Response
 from pydantic import BaseModel
 
 from talent.models import (
@@ -22,6 +23,11 @@ from talent.models import (
     EmployeeCreate,
     EmployeeUpdate,
     SyncResult,
+)
+from talent.report_generator import (
+    generate_talent_docx_bytes,
+    generate_talent_pptx_bytes,
+    generate_talent_xlsx_bytes,
 )
 from talent.services import TalentService
 
@@ -383,3 +389,65 @@ async def delete_allocation(allocation_id: str) -> dict[str, Any]:
     if not deleted:
         raise HTTPException(status_code=404, detail=f"Allocation {allocation_id} not found.")
     return {"deleted": True, "allocation_id": allocation_id}
+
+
+# ---------------------------------------------------------------------------
+# Reports — download PPTX / XLSX / DOCX of the current talent state.
+# All three read from the same shared context (see talent/report_generator.py).
+# ---------------------------------------------------------------------------
+
+from datetime import date as _date  # local alias — avoids clashing with fastapi date
+
+
+def _load_report_inputs():
+    """Fetch employees, projects, allocations in one shot."""
+    return (
+        _svc.employee_repo.list_all(),
+        _svc.project_repo.list_all(),
+        _svc.allocation_repo.list_all(),
+    )
+
+
+@router.get("/export/ppt", dependencies=[Depends(verify_api_key)])
+async def export_talent_ppt() -> Response:
+    """Generate and stream a .pptx talent report. No file is saved to disk."""
+    employees, projects, allocations = await asyncio.to_thread(_load_report_inputs)
+    pptx_bytes = await asyncio.to_thread(
+        generate_talent_pptx_bytes, employees, projects, allocations
+    )
+    filename = f"Talent_Report_{_date.today().isoformat()}.pptx"
+    return Response(
+        content=pptx_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.presentationml.presentation",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/export/xlsx", dependencies=[Depends(verify_api_key)])
+async def export_talent_xlsx() -> Response:
+    """Generate and stream an .xlsx talent report."""
+    employees, projects, allocations = await asyncio.to_thread(_load_report_inputs)
+    xlsx_bytes = await asyncio.to_thread(
+        generate_talent_xlsx_bytes, employees, projects, allocations
+    )
+    filename = f"Talent_Report_{_date.today().isoformat()}.xlsx"
+    return Response(
+        content=xlsx_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@router.get("/export/docx", dependencies=[Depends(verify_api_key)])
+async def export_talent_docx() -> Response:
+    """Generate and stream a .docx talent report."""
+    employees, projects, allocations = await asyncio.to_thread(_load_report_inputs)
+    docx_bytes = await asyncio.to_thread(
+        generate_talent_docx_bytes, employees, projects, allocations
+    )
+    filename = f"Talent_Report_{_date.today().isoformat()}.docx"
+    return Response(
+        content=docx_bytes,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

@@ -14,6 +14,7 @@ import logging
 from datetime import date, timedelta
 from typing import Any
 
+from agent.state import extract_json, llm_generate
 from interfaces.llm import LLMClient, LLMResponse, ToolSpec
 from interfaces.storage import SessionStore
 from talent.repository import (
@@ -61,6 +62,39 @@ tell the user to ask the PM agent.
 """
 
 _MAX_HISTORY = 16  # keep last 8 turns
+
+
+# ---------------------------------------------------------------------------
+# Supervisor — LLM-driven intent classifier for the talent chat.
+# Mirrors the PM supervisor (agent/supervisor.py) pattern: one LLM call up
+# front returns the intent as JSON, and the main chat() routes accordingly.
+# ---------------------------------------------------------------------------
+
+_TALENT_SUPERVISOR_PROMPT = """You classify intent for the Talent Management chat.
+
+Return exactly ONE of these intents (JSON only):
+
+- talent_report  : user wants a DOWNLOADABLE report / deck / spreadsheet / document
+                   about the team, skills, availability, allocations, bench, etc.
+                   Signals: "generate/create/build a report", "PPT", "pptx", "PowerPoint",
+                   "slide deck", "deck", "presentation", "Excel", "xlsx", "spreadsheet",
+                   "Word", "docx", "download the ...", "add this to a pptx",
+                   "put this in a deck", "export as Excel", etc.
+                   ALSO includes references to prior message content: "put the above in
+                   a deck", "create a PPT and add all this inside".
+- talent_chat    : any other talent-related question (who is available, skill matrix,
+                   bench analysis, capacity planning, hiring recommendations, comparisons,
+                   general Q&A, greetings, follow-ups).
+
+Reply with JSON only — no other text:
+{{"intent": "<talent_report|talent_chat>"}}
+
+Recent conversation (for context):
+{history}
+
+Current message:
+{message}
+"""
 
 
 class TalentAgent:
@@ -187,14 +221,84 @@ class TalentAgent:
     # Chat
     # ------------------------------------------------------------------
 
+    async def _classify_intent(
+        self,
+        user_message: str,
+        history: list[dict[str, Any]],
+    ) -> str:
+        """LLM supervisor — returns 'talent_report' or 'talent_chat'.
+
+        Uses the same one-shot JSON-classifier pattern as agent/supervisor.py.
+        Falls back to 'talent_chat' on any parsing error so the user always
+        gets a response (never a hard failure at the routing step).
+        """
+        # Include the last few turns so references like "put the above in a deck"
+        # or "create a ppt and add all this" can be resolved against context.
+        try:
+            recent = history[-6:]
+            hist_block = "\n".join(
+                f'{m["role"].upper()}: {m["content"][:200]}' for m in recent
+            ) or "(no prior messages)"
+            prompt = _TALENT_SUPERVISOR_PROMPT.format(
+                history=hist_block,
+                message=user_message,
+            )
+            raw = await llm_generate(self._llm, prompt, user_message)
+            parsed = extract_json(raw)
+            intent = parsed.get("intent", "talent_chat")
+            if intent not in ("talent_report", "talent_chat"):
+                intent = "talent_chat"
+            log.info("[TALENT_SUPERVISOR] → intent=%r  msg=%r",
+                     intent, user_message[:80])
+            return intent
+        except Exception as exc:
+            log.warning("[TALENT_SUPERVISOR] classify failed, defaulting to chat: %s", exc)
+            return "talent_chat"
+
     async def chat(
         self,
         session_id: str,
         user_message: str,
         user_id: str | None = None,
     ) -> tuple[str, str]:
-        """Process one user turn and return (reply, intent="talent")."""
+        """Process one user turn and return (reply, intent).
+
+        Flow (mirrors PM supervisor graph):
+          1. Load history.
+          2. Supervisor node — LLM classifies the message into an intent,
+             which is stored in `state["intent"]`.
+          3. Route: talent_report → download-card reply.
+                    talent_chat   → context-injected LLM chat.
+        """
         history: list[dict[str, Any]] = self._store.get_history(session_id)
+
+        # ── Step 1: supervisor classification (LLM-driven, in AgentState) ──
+        state: dict[str, Any] = {
+            "user_message": user_message,
+            "history": list(history),
+            "intent": "unknown",
+            "result": "",
+        }
+        state["intent"] = await self._classify_intent(user_message, history)
+
+        # ── Step 2: route on intent ────────────────────────────────────────
+        if state["intent"] == "talent_report":
+            reply = (
+                "## Talent Report Ready\n\n"
+                "Your report is available in three formats:\n\n"
+                "- **PowerPoint (.pptx)** — [Download](/api/talent/export/ppt)\n"
+                "- **Excel (.xlsx)** — [Download](/api/talent/export/xlsx)\n"
+                "- **Word (.docx)** — [Download](/api/talent/export/docx)\n\n"
+                "Includes: team overview, availability breakdown, skill coverage, "
+                "active projects, and rolling-off-in-30-days."
+            )
+            state["result"] = reply
+            history.append({"role": "user", "content": user_message})
+            history.append({"role": "assistant", "content": reply})
+            self._store.save_history(session_id, history)
+            return reply, "talent_report"
+
+        # Fall-through: talent_chat — normal context-injected LLM reply
         trimmed = history[-_MAX_HISTORY:] if len(history) > _MAX_HISTORY else history
 
         # Prepend long-term memory context (session summary + user facts)
